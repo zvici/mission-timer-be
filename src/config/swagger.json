@@ -6,7 +6,7 @@
     "url": "https://opensource.org/licenses/MIT"
   },
   "version": "1.0.0",
-  "host": "https://mission-timer-be.herokuapp.com",
+  "host": "mission-timer-be.herokuapp.com",
   "basePath": "/api",
   "tags": [
     {
@@ -18,11 +18,49 @@
   "consumes": ["application/json"],
   "produces": ["application/json"],
   "paths": {
-    "/users/login": {
+    "/user/login": {
       "post": {
         "tags": ["Users"],
         "summary": "API Endpoint to login account",
         "description": "Login User Admin",
+        "parameters": [
+          {
+            "name": "Body Login",
+            "description": "The login",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "required": ["userId", "password"],
+              "properties": {
+                "userId": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Invalid username/password supplied"
+          }
+        }
+      }
+    },
+    "/user/staff/login": {
+      "post": {
+        "tags": ["Users"],
+        "summary": "API Endpoint to login account",
+        "description": "Login User Staff",
         "parameters": [
           {
             "name": "Body Login",

@@ -10,6 +10,14 @@ const authAdmin = asyncHandler(async (req, res) => {
 
   const user = await User.findOne({ userId })
 
+  if (!user) {
+    return res.status(401).json({
+      code: 0,
+      msg: 'error',
+      message: 'Sai tài khoản hoặc mật khẩu!',
+    })
+  }
+
   if (user.role !== 'ADMIN') {
     return res.status(401).json({
       code: 0,
@@ -45,6 +53,14 @@ const authStaff = asyncHandler(async (req, res) => {
   const { userId, password } = req.body
 
   const user = await User.findOne({ userId })
+
+  if (!user) {
+    return res.status(401).json({
+      code: 0,
+      msg: 'error',
+      message: 'Sai tài khoản hoặc mật khẩu!',
+    })
+  }
 
   if (user.role !== 'STAFF') {
     return res.status(401).json({
