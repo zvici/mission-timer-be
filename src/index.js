@@ -3,8 +3,13 @@ import dotenv from 'dotenv'
 import morgan from 'morgan'
 import connectDB from './config/db.js'
 import swaggerUi from 'swagger-ui-express'
+import { readFile } from 'fs/promises';
+
+
 import cors from 'cors'
 import colors from 'colors'
+
+const swaggerDocument = JSON.parse(await readFile(new URL('./config/swagger.json', import.meta.url)));
 
 import userRoutes from './routes/userRoutes.js'
 
@@ -17,7 +22,13 @@ app.use(morgan('combined'))
 app.use(express.json())
 app.use(cors())
 
-app.use('/api/docs', swaggerUi.serve, swaggerUi.setup('../swagger.json'))
+app.use(
+  '/api/docs',
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerDocument, {
+    explorer: true,
+  })
+)
 
 // app.use('/api/auth', routes.auth)
 app.use('/api/user', userRoutes)
