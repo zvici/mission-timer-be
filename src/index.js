@@ -4,24 +4,23 @@ import morgan from 'morgan'
 import connectDB from './config/db.js'
 import swaggerUi from 'swagger-ui-express'
 import cors from 'cors'
-import swaggerDocument from '../swagger.json'
-import routes from './routes'
 import colors from 'colors'
 
+import userRoutes from './routes/userRoutes.js'
+
 dotenv.config()
-connectDB();
+connectDB()
 
 // middlewares
-const app = express();
+const app = express()
 app.use(morgan('combined'))
 app.use(express.json())
 app.use(cors())
 
-// routes
-// app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup('../swagger.json'))
 
 // app.use('/api/auth', routes.auth)
-// app.use('/api/user', routes.user)
+app.use('/api/user', userRoutes)
 // app.use('/api/department', routes.department)
 // app.use('/api/year', routes.year)
 // app.use('/api/subject', routes.subject)
@@ -30,11 +29,16 @@ app.use(cors())
 // app.use('/api/activity', routes.activity)
 
 app.get('/', (req, res) => {
-  res.send('API mission timer')
+  res.send({
+    message: 'Welcome to Api Mission timer',
+  })
 })
 
-app.listen(port, () => {
+const PORT = process.env.PORT || 3000
+
+app.listen(PORT, () => {
   console.log(
-    `Server running in ${process.env.NODE_ENV} mode on port ${PORT}`.yellow.bold
+    `🚝 Server running in ${process.env.NODE_ENV} mode on port ${PORT}, click to http://localhost:${PORT}`
+      .yellow.bold
   )
 })

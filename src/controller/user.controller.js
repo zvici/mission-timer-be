@@ -1,30 +1,101 @@
 import asyncHandler from 'express-async-handler'
 import User from '../models/user.model.js'
-import generator from 'generate-password'
 import generateToken from '../utils/generateToken.js'
 
-// @desc   Create one user
-// @route  Post /api/users/
-// @access Admin
+// @desc   Auth admin and get token
+// @route  POST /api/users/login
+// @access Public
+const authAdmin = asyncHandler(async (req, res) => {
+  const { userId, password } = req.body
 
-const createUser = asyncHandler(async (req, res) => {
-  const userIdExist = await User.findOne({
-    userId: req.body.userId,
-  })
-  if (userIdExist) {
-    res.status(400)
-    throw Error(JSON.stringify({ code: 0, message: 'User ID already exist' }))
-  }
-  // check user is already in database
-  const emailExist = await User.findOne({ email: req.body.email })
-  if (emailExist) {
-    res.status(400)
-    throw Error(JSON.stringify({ code: 0, message: 'Email already exist' }))
+  const user = await User.findOne({ userId })
+
+  if (user.role !== 'ADMIN') {
+    return res.status(401).json({
+      code: 0,
+      msg: 'error',
+      message: 'Không được phép đăng nhập!',
+    })
   }
 
-  // create random password
-  const randomPassword = generator.generate({
-    length: 8,
-    numbes: true,
-  })
+  if (user && (await user.matchPassword(password))) {
+    const userRes = await User.findOne({ userId }).select(['-password'])
+    res.json({
+      code: 1,
+      msg: 'success',
+      message: 'Đăng nhập thành công!',
+      data: {
+        user: userRes,
+        token: generateToken(user._id),
+      },
+    })
+  } else {
+    return res.status(401).json({
+      code: 0,
+      msg: 'error',
+      message: 'Sai tài khoản hoặc mật khẩu!',
+    })
+  }
 })
+
+// @desc   Auth staff and get token
+// @route  POST /api/users/staff/login
+// @access Public
+const authStaff = asyncHandler(async (req, res) => {
+  const { userId, password } = req.body
+
+  const user = await User.findOne({ userId })
+
+  if (user.role !== 'STAFF') {
+    return res.status(401).json({
+      code: 0,
+      msg: 'error',
+      message: 'Không được phép đăng nhập!',
+    })
+  }
+
+  if (user && (await user.matchPassword(password))) {
+    const userRes = await User.findOne({ userId }).select(['-password'])
+    res.json({
+      code: 1,
+      msg: 'success',
+      message: 'Đăng nhập thành công!',
+      data: {
+        user: userRes,
+        token: generateToken(user._id),
+      },
+    })
+  } else {
+    return res.status(401).json({
+      code: 0,
+      msg: 'error',
+      message: 'Sai tài khoản hoặc mật khẩu!',
+    })
+  }
+})
+
+// @desc   Get list
+// @route  Get /api/users/
+// @access Admin
+const getUsers = asyncHandler(async (req, res) => {
+  const users = await User.find().sort({
+    createdAt: -1,
+  })
+
+  if (users) {
+    res.send({
+      code: 0,
+      msg: 'success',
+      message: 'List all user',
+      data: users,
+    })
+  } else {
+    return res.status(401).json({
+      code: 0,
+      msg: 'error',
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+    })
+  }
+})
+
+export { getUsers, authAdmin, authStaff }

@@ -18,9 +18,10 @@ const userSchema = mongoose.Schema(
       required: true,
     },
 
-    department: {
+    departmentId: {
       type: String,
       required: true,
+      ref: 'Department',
     },
 
     role: {

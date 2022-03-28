@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose'
 
 const departmentSchema = mongoose.Schema(
   {
@@ -6,7 +6,10 @@ const departmentSchema = mongoose.Schema(
       type: String,
       required: true,
     },
-
+    departmentId: {
+      type: String,
+      required: true,
+    },
     email: String,
     phone: String,
     address: String,
@@ -15,7 +18,7 @@ const departmentSchema = mongoose.Schema(
   {
     timestamps: true,
   }
-);
+)
 
 const Departments = mongoose.model('Departments', departmentSchema)
 
