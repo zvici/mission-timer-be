@@ -100,7 +100,7 @@ const getUsers = asyncHandler(async (req, res) => {
 
   if (users) {
     res.send({
-      code: 0,
+      code: 1,
       msg: 'success',
       message: 'List all user',
       data: users,
@@ -114,4 +114,65 @@ const getUsers = asyncHandler(async (req, res) => {
   }
 })
 
-export { getUsers, authAdmin, authStaff }
+// @desc   Creat user
+// @route  Post /api/users/
+// @access Admin
+const createUser = asyncHandler(async (req, res) => {
+  const { userId } = req.body
+  const isUserExist = users.findOne({ userId })
+  if (isUserExist) {
+    return res.status(400).json({
+      code: 0,
+      msg: 'error',
+      message: 'User đã tồn tại!',
+    })
+  }
+  const user = await User.save(req.body)
+  if (user) {
+    res.send({
+      code: 1,
+      msg: 'success',
+      message: 'Tạo user thành công!',
+      data: user,
+    })
+  } else {
+    return res.status(401).json({
+      code: 0,
+      msg: 'error',
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+    })
+  }
+})
+
+// @desc   Update user
+// @route  PUT /api/users/
+// @access Admin
+
+const updateUser = asyncHandler(async (req, res) => {
+  if (req.body) {
+    let user = await User.findById(req.params.id)
+    if (user) {
+      let updateUser = await user.save()
+      res.send({
+        code: 0,
+        msg: 'success',
+        message: 'Successfully update user',
+        data: updateUser,
+      })
+    } else {
+      return res.status(404).json({
+        code: 0,
+        msg: 'error',
+        message: 'Không tìm thấy user!',
+      })
+    }
+  } else {
+    return res.status(401).json({
+      code: 0,
+      msg: 'error',
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+    })
+  }
+})
+
+export { getUsers, authAdmin, authStaff, createUser, updateUser }
