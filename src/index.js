@@ -12,6 +12,7 @@ import colors from 'colors'
 const swaggerDocument = JSON.parse(await readFile(new URL('./config/swagger.json', import.meta.url)));
 
 import userRoutes from './routes/userRoutes.js'
+import yearRoutes from './routes/yearRoutes.js'
 
 dotenv.config()
 connectDB()
@@ -30,10 +31,11 @@ app.use(
   })
 )
 
-// app.use('/api/auth', routes.auth)
+// Use router
+
 app.use('/api/user', userRoutes)
 // app.use('/api/department', routes.department)
-// app.use('/api/year', routes.year)
+app.use('/api/year', yearRoutes)
 // app.use('/api/subject', routes.subject)
 // app.use('/api/otp', routes.otp)
 // app.use('/api/activity-type', routes.activityType)
