@@ -201,6 +201,28 @@ const updateUserPassword = asyncHandler(async (req, res) => {
       message: 'Cập nhật mật khẩu thành công!',
     })
   } catch (error) {
+    return errorRespone(res, 400, 0, 'error', error)
+  }
+})
+
+// @desc   Update profile for user
+// @route  Put /api/user/updateprofile
+// @access Public
+const updateProfileUser = asyncHandler(async (req, res)=> {
+  const { phone, address, avatar } = req.body
+  // update profile user
+  try{
+    const user = await User.findByIdAndUpdate(req.user._id, {
+      phone,
+      address,
+      avatar,
+    })
+    return res.status(200).json({
+      code: 1,
+      msg: 'success',
+      message: 'Cập nhật thành công!',
+    })
+  }catch(error){
     return errorRespone(res, 400, 1, 'error', error)
   }
 })
@@ -212,4 +234,5 @@ export {
   createUser,
   updateUser,
   updateUserPassword,
+  updateProfileUser
 }
