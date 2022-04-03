@@ -1,6 +1,8 @@
 import asyncHandler from 'express-async-handler'
 import User from '../models/user.model.js'
 import generateToken from '../utils/generateToken.js'
+import jwt from 'jsonwebtoken'
+import errorRespone from '../utils/errorRespone.js'
 
 // @desc   Auth admin and get token
 // @route  POST /api/users/login
@@ -154,7 +156,7 @@ const updateUser = asyncHandler(async (req, res) => {
     if (user) {
       let updateUser = await user.save()
       res.send({
-        code: 0,
+        code: 1,
         msg: 'success',
         message: 'Successfully update user',
         data: updateUser,
@@ -175,4 +177,39 @@ const updateUser = asyncHandler(async (req, res) => {
   }
 })
 
-export { getUsers, authAdmin, authStaff, createUser, updateUser }
+// @desc   Update password for user
+// @route  Put /api/user/password
+// @access Public
+const updateUserPassword = asyncHandler(async (req, res) => {
+  const { currentPassword, newPassword } = req.body
+  const token = req.headers.authorization.split(' ')[1]
+  const decoded = jwt.verify(token, process.env.JWT_SECRET)
+  const user = await User.findById(decoded.id)
+
+  // Check current password match password in database
+  if (!(await user.matchPassword(currentPassword))) {
+    return errorRespone(res, 401, 0, 'error', 'Mật khẩu hiện tại không đúng!')
+  }
+
+  // upadate password
+  try {
+    user.password = newPassword
+    await user.save()
+    return res.status(200).json({
+      code: 1,
+      msg: 'success',
+      message: 'Cập nhật mật khẩu thành công!',
+    })
+  } catch (error) {
+    return errorRespone(res, 400, 1, 'error', error)
+  }
+})
+
+export {
+  getUsers,
+  authAdmin,
+  authStaff,
+  createUser,
+  updateUser,
+  updateUserPassword,
+}
