@@ -13,6 +13,7 @@ const swaggerDocument = JSON.parse(await readFile(new URL('./config/swagger.json
 
 import userRoutes from './routes/userRoutes.js'
 import yearRoutes from './routes/yearRoutes.js'
+import activityRoutes from './routes/activityRoutes.js'
 
 dotenv.config()
 connectDB()
@@ -38,8 +39,7 @@ app.use('/api/user', userRoutes)
 app.use('/api/year', yearRoutes)
 // app.use('/api/subject', routes.subject)
 // app.use('/api/otp', routes.otp)
-// app.use('/api/activity-type', routes.activityType)
-// app.use('/api/activity', routes.activity)
+app.use('/api/activity', activityRoutes)
 
 app.get('/', (req, res) => {
   res.send({

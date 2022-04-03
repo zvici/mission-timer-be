@@ -1,20 +1,39 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose'
 
-const activityDetailSchema = mongoose.Schema(
+const activitySchema = mongoose.Schema(
   {
-    activity: {
+    rollUpType: {
+      type: String,
+      enum: ['STAFF', 'ACADEMIC_STAFF'],
+      required: true,
+    },
+    content: {
       type: String,
       required: true,
     },
-
-    startDate: Date,
-    endDate: Date,
-    content: String,
-    image: String,
+    taskMaster: {
+      type: String,
+      required: true,
+    },
+    assignee: {
+      type: String,
+      required: true,
+    },
+    quota: {
+      type: String,
+      required: true,
+    },
+    year: {
+      type: String,
+      required: true,
+      ref: 'year'
+    },
+    specifiedTime: Number,
+    status: String,
+    description: String,
   },
   { timestamps: true }
-);
+)
+const Activities = mongoose.model('Activities', activitySchema)
 
-const ActivityDetails = mongoose.model('ActivityDetails', activityDetailSchema)
-
-export default ActivityDetails
+export default Activities
