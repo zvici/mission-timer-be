@@ -53,6 +53,7 @@ const authAdmin = asyncHandler(async (req, res) => {
 // @access Public
 const authStaff = asyncHandler(async (req, res) => {
   const { userId, password } = req.body
+  console.log(req.body)
 
   const user = await User.findOne({ userId })
 
@@ -228,7 +229,7 @@ const updateProfileUser = asyncHandler(async (req, res)=> {
   // check email exists
   const isEmailExists = User.exists({ email })
   if(isEmailExists && email != req.user.email){
-    return errorRespone(res, 400, 1, 'error', 'Email này đã tồn tại!')
+    return errorRespone(res, 409, 1, 'error', 'Email này đã tồn tại!')
   }
   // update profile user
   try{
