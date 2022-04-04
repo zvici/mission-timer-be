@@ -224,13 +224,19 @@ const getProfileMe = asyncHandler(async (req, res)=> {
 // @route  Put /api/user/updateprofile
 // @access Public
 const updateProfileUser = asyncHandler(async (req, res)=> {
-  const { phone, address, avatar } = req.body
+  const { phone, address, avatar, email } = req.body
+  // check email exists
+  const isEmailExists = User.exists({ email })
+  if(isEmailExists && email != req.user.email){
+    return errorRespone(res, 400, 1, 'error', 'Email này đã tồn tại!')
+  }
   // update profile user
   try{
-    const user = await User.findByIdAndUpdate(req.user._id, {
+    await User.findByIdAndUpdate(req.user._id, {
       phone,
       address,
       avatar,
+      email,
     })
     return res.status(200).json({
       code: 1,
