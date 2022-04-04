@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken'
 import errorRespone from '../utils/errorRespone.js'
 
 // @desc   Auth admin and get token
-// @route  POST /api/users/login
+// @route  POST /api/user/login
 // @access Public
 const authAdmin = asyncHandler(async (req, res) => {
   const { userId, password } = req.body
@@ -30,7 +30,7 @@ const authAdmin = asyncHandler(async (req, res) => {
 
   if (user && (await user.matchPassword(password))) {
     const userRes = await User.findOne({ userId }).select(['-password'])
-    res.json({
+    return res.json({
       code: 1,
       msg: 'success',
       message: 'Đăng nhập thành công!',
@@ -49,7 +49,7 @@ const authAdmin = asyncHandler(async (req, res) => {
 })
 
 // @desc   Auth staff and get token
-// @route  POST /api/users/staff/login
+// @route  POST /api/user/staff/login
 // @access Public
 const authStaff = asyncHandler(async (req, res) => {
   const { userId, password } = req.body
@@ -93,7 +93,7 @@ const authStaff = asyncHandler(async (req, res) => {
 })
 
 // @desc   Get list
-// @route  Get /api/users/
+// @route  Get /api/user/
 // @access Admin
 const getUsers = asyncHandler(async (req, res) => {
   const users = await User.find().sort({
@@ -206,6 +206,21 @@ const updateUserPassword = asyncHandler(async (req, res) => {
 })
 
 // @desc   Update profile for user
+// @route  Put /api/user/me
+// @access Protect
+const getProfileMe = asyncHandler(async (req, res)=> {
+  return res.status(200).json({
+    code: 1,
+    msg: 'success',
+    message: 'Thông tin hồ sơ cá nhân!',
+    data: {
+      profile: req.user
+    }
+  })
+})
+
+
+// @desc   Update profile for user
 // @route  Put /api/user/updateprofile
 // @access Public
 const updateProfileUser = asyncHandler(async (req, res)=> {
@@ -234,5 +249,6 @@ export {
   createUser,
   updateUser,
   updateUserPassword,
-  updateProfileUser
+  updateProfileUser,
+  getProfileMe
 }
