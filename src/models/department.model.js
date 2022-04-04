@@ -6,10 +6,6 @@ const departmentSchema = mongoose.Schema(
       type: String,
       required: true,
     },
-    departmentId: {
-      type: String,
-      required: true,
-    },
     email: String,
     phone: String,
     address: String,

@@ -18,9 +18,6 @@ const importData = async () => {
     await User.deleteMany()
     const createdUsers = await User.insertMany(users)
 
-    await Departments.deleteMany()
-    await Departments.insertMany(departments)
-
     const adminUser = createdUsers[0]._id
     console.log('💎 Data Imported!'.green.inverse)
     process.exit()
@@ -32,7 +29,6 @@ const importData = async () => {
 const destroyData = async () => {
   try {
     await User.deleteMany()
-    await Departments.deleteMany()
     console.log('🧨 Data Destroyed!'.red.inverse)
     process.exit()
   } catch (error) {

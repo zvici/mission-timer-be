@@ -9,7 +9,6 @@ const users = [
     email: 'nhatranthanh113@gmail.com',
     phone: '0334664242',
     address: 'TP HCM',
-    departmentId: 'CNTT',
   },
   {
     name: 'Phúc Hồ',
@@ -19,7 +18,6 @@ const users = [
     email: 'nhatranthanh117@gmail.com',
     phone: '0334446611',
     address: 'Bình Dương',
-    departmentId: 'CNTT',
   },
 ]
 

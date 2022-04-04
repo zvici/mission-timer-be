@@ -18,19 +18,17 @@ const userSchema = mongoose.Schema(
       required: true,
     },
 
-    departmentId: {
-      type: String,
+    department: {
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: 'Department',
     },
-
     role: {
       type: String,
       enum: ['ADMIN', 'ACADEMIC_STAFF', 'STAFF'],
       required: true,
       default: 'STAFF',
     },
-
     email: {
       type: String,
       required: true,
@@ -41,12 +39,10 @@ const userSchema = mongoose.Schema(
       required: true,
       default: true,
     },
-
     isPasswordChanged: {
       type: Boolean,
       default: false,
     },
-
     phone: String,
     address: String,
     avatar: String,

@@ -2,33 +2,41 @@ import mongoose from 'mongoose'
 
 const activitySchema = mongoose.Schema(
   {
-    rollUpType: {
-      type: String,
-      enum: ['STAFF', 'ACADEMIC_STAFF'],
+    year: {
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
+      ref: 'Year',
     },
     content: {
       type: String,
       required: true,
     },
+    startDate: {
+      type: Date,
+    },
+    endDate: {
+      type: Date,
+    },
     taskMaster: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
+      ref: 'User',
     },
     assignee: {
-      type: String,
+      type: [mongoose.Schema.Types.ObjectId],
       required: true,
+      ref: 'User',
     },
     quota: {
       type: String,
       required: true,
     },
-    year: {
+    rollUpType: {
       type: String,
+      enum: ['STAFF', 'ACADEMIC_STAFF'],
       required: true,
-      ref: 'year'
     },
-    specifiedTime: Number,
+    specifiedTime: Date,
     status: String,
     description: String,
   },

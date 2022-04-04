@@ -11,7 +11,6 @@ const yearSchema = mongoose.Schema(
       type: Date,
       required: true,
     },
-
     endDate: Date,
     description: String,
   },
