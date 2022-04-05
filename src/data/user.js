@@ -13,7 +13,7 @@ const users = [
   {
     name: 'Phúc Hồ',
     userId: '00001',
-    password: bcrypt.hashSync('123456', 10),
+    password: bcrypt.hashSync('1234567', 10),
     role: 'STAFF',
     email: 'nhatranthanh117@gmail.com',
     phone: '0334446611',

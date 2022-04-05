@@ -17,10 +17,8 @@ const userSchema = mongoose.Schema(
       type: String,
       required: true,
     },
-
     department: {
       type: mongoose.Schema.Types.ObjectId,
-      required: true,
       ref: 'Department',
     },
     role: {
