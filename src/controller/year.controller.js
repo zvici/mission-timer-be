@@ -6,10 +6,16 @@ import errorRespone from '../utils/errorRespone.js'
 // @route  POST /api/year
 // @access Admin
 const createYear = asyncHandler(async (req, res) => {
-  const { name, startDate, endDate, description } = req.body
+  const { startDate, endDate, description } = req.body
+  const yearCut = startDate.split('-')[0]
+  //Check year exist
+  const existYear = await Years.findOne({ name: { $regex: `^${yearCut}` } })
+  if (existYear) {
+    return errorRespone(res, 400, 0, 'error', 'Năm học đã tồn tại!')
+  }
   try {
     const year = await new Years({
-      name,
+      name: `${yearCut}-${Number(yearCut) + 1}`,
       startDate,
       endDate,
       description,
@@ -64,8 +70,41 @@ const getYears = asyncHandler(async (req, res) => {
       },
     })
   } catch (error) {
-    return errorRespone(res, 400, 1, 'error', error)
+    return errorRespone(res, 400, 0, 'error', error)
   }
 })
 
-export { createYear, getYears, deleteYear }
+// @desc   Update Year
+// @route  PUT /api/year
+// @access Admin
+
+const updateYear = asyncHandler(async (req, res) => {
+  const { startDate, endDate, description } = req.body
+  let year = await Years.findById(req.params.id)
+  if (!year) {
+    return errorRespone(res, 404, 1, 'error', 'Không tìm thấy năm học này!')
+  }
+  const yearCut = startDate.split('-')[0]
+  const existYear = await Years.findOne({ name: { $regex: `^${yearCut}` } })
+  if (existYear && (existYear.startDate.toString() !== year.startDate.toString())) {
+    return errorRespone(res, 400, 0, 'error', 'Năm học đã tồn tại!')
+  }
+  try {
+    year.startDate = startDate;
+    year.endDate = endDate;
+    year.description = description;
+    const upadateYear = await year.save()
+    return res.send({
+      code: 1,
+      msg: 'success',
+      message: 'Cập nhật năm học thành công!',
+      data: {
+        year: upadateYear,
+      }
+    })
+  } catch (error) {
+    return errorRespone(res, 400, 0, 'error', error)
+  }
+})
+
+export { createYear, getYears, deleteYear, updateYear }
