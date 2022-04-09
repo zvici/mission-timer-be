@@ -22,11 +22,6 @@ const activitySchema = mongoose.Schema(
       required: true,
       ref: 'User',
     },
-    assignee: {
-      type: [mongoose.Schema.Types.ObjectId],
-      required: true,
-      ref: 'User',
-    },
     quota: {
       type: String,
       required: true,
@@ -36,9 +31,14 @@ const activitySchema = mongoose.Schema(
       enum: ['STAFF', 'ACADEMIC_STAFF'],
       required: true,
     },
-    specifiedTime: Date,
-    status: String,
-    description: String,
+    status: {
+      type: String,
+      default: "active",
+    },
+    description: {
+      type: String,
+      default: "",
+    },
   },
   { timestamps: true }
 )

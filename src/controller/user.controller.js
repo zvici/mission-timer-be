@@ -53,10 +53,8 @@ const authAdmin = asyncHandler(async (req, res) => {
 // @access Public
 const authStaff = asyncHandler(async (req, res) => {
   const { userId, password } = req.body
-  console.log(req.body)
-
   const user = await User.findOne({ userId })
-
+  console.log(user)
   if (!user) {
     return res.status(401).json({
       code: 0,
@@ -72,7 +70,6 @@ const authStaff = asyncHandler(async (req, res) => {
       message: 'Không được phép đăng nhập!',
     })
   }
-
   if (user && (await user.matchPassword(password))) {
     const userRes = await User.findOne({ userId }).select(['-password'])
     res.json({

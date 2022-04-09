@@ -1,5 +1,5 @@
 import asyncHandler from 'express-async-handler'
-import Years from '../models/year.model.js'
+import Year from '../models/year.model.js'
 import errorRespone from '../utils/errorRespone.js'
 
 // @desc   Create one Year
@@ -8,13 +8,13 @@ import errorRespone from '../utils/errorRespone.js'
 const createYear = asyncHandler(async (req, res) => {
   const { startDate, endDate, description } = req.body
   const yearCut = startDate.split('-')[0]
+  const existYear = await Year.findOne({ name: { $regex: `^${yearCut}` } })
   //Check year exist
-  const existYear = await Years.findOne({ name: { $regex: `^${yearCut}` } })
   if (existYear) {
     return errorRespone(res, 400, 0, 'error', 'Năm học đã tồn tại!')
   }
   try {
-    const year = await new Years({
+    const year = await new Year({
       name: `${yearCut}-${Number(yearCut) + 1}`,
       startDate,
       endDate,
@@ -38,7 +38,7 @@ const createYear = asyncHandler(async (req, res) => {
 // @route  DELETE /api/year
 // @access Admin
 const deleteYear = asyncHandler(async (req, res) => {
-  const year = await Years.findById(req.params.id)
+  const year = await Year.findById(req.params.id)
   if (!year) {
     return errorRespone(res, 404, 0, 'error', 'Năm học không tồn tại!')
   }
@@ -60,7 +60,7 @@ const deleteYear = asyncHandler(async (req, res) => {
 // @access Admin
 const getYears = asyncHandler(async (req, res) => {
   try {
-    const years = await Years.find()
+    const years = await Year.find()
     res.send({
       code: 1,
       msg: 'success',
@@ -80,12 +80,12 @@ const getYears = asyncHandler(async (req, res) => {
 
 const updateYear = asyncHandler(async (req, res) => {
   const { startDate, endDate, description } = req.body
-  let year = await Years.findById(req.params.id)
+  let year = await Year.findById(req.params.id)
   if (!year) {
     return errorRespone(res, 404, 1, 'error', 'Không tìm thấy năm học này!')
   }
   const yearCut = startDate.split('-')[0]
-  const existYear = await Years.findOne({ name: { $regex: `^${yearCut}` } })
+  const existYear = await Year.findOne({ name: { $regex: `^${yearCut}` } })
   if (existYear && (existYear.startDate.toString() !== year.startDate.toString())) {
     return errorRespone(res, 400, 0, 'error', 'Năm học đã tồn tại!')
   }

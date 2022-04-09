@@ -17,6 +17,6 @@ const yearSchema = mongoose.Schema(
   { timestamps: true }
 )
 
-const Years = mongoose.model('Years', yearSchema)
+const Year = mongoose.model('Year', yearSchema)
 
-export default Years
+export default Year

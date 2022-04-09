@@ -1,20 +1,32 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose'
 
-const activityDetailSchema = mongoose.Schema(
-  {
-    activity: {
-      type: String,
-      required: true,
-    },
-
-    startDate: Date,
-    endDate: Date,
-    content: String,
-    image: String,
+const activityDetailSchema = mongoose.Schema({
+  activity: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: 'Activities',
   },
-  { timestamps: true }
-);
+  assignee: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: 'User',
+  },
+  status: {
+    type: String,
+    require: true,
+    enum: ['accept', 'refuse', 'attended', 'not answered', 'not engaged'],
+    default: 'not answered',
+  },
+  image: {
+    type: String,
+    default: '',
+  },
+  description: {
+    type: String,
+    default: '',
+  },
+})
 
-const ActivityDetails = mongoose.model('ActivityDetails', activityDetailSchema)
+const ActivityDetail = mongoose.model('ActivityDetail', activityDetailSchema)
 
-export default ActivityDetails
+export default ActivityDetail
