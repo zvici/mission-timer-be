@@ -33,11 +33,11 @@ const activitySchema = mongoose.Schema(
     },
     status: {
       type: String,
-      default: "active",
+      default: 'active',
     },
     description: {
       type: String,
-      default: "",
+      default: '',
     },
   },
   { timestamps: true }

@@ -51,7 +51,7 @@ const createActivity = asyncHandler(async (req, res) => {
 
 const getActivities = asyncHandler(async (req, res) => {
   try {
-    const activities = await Activities.find()
+    const activities = await Activities.find().populate('taskMaster', 'name')
     return res.send({
       code: 1,
       msg: 'success',

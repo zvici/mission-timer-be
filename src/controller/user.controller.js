@@ -3,6 +3,9 @@ import User from '../models/user.model.js'
 import generateToken from '../utils/generateToken.js'
 import jwt from 'jsonwebtoken'
 import errorRespone from '../utils/errorRespone.js'
+import formidable from 'formidable'
+import cloudinary from '../config/cloudinary.config.js'
+import uploads from '../config/cloudinary.config.js'
 
 // @desc   Auth admin and get token
 // @route  POST /api/user/login
@@ -206,34 +209,32 @@ const updateUserPassword = asyncHandler(async (req, res) => {
 // @desc   Update profile for user
 // @route  Put /api/user/me
 // @access Protect
-const getProfileMe = asyncHandler(async (req, res)=> {
+const getProfileMe = asyncHandler(async (req, res) => {
   return res.status(200).json({
     code: 1,
     msg: 'success',
     message: 'Thông tin hồ sơ cá nhân!',
     data: {
-      profile: req.user
-    }
+      profile: req.user,
+    },
   })
 })
-
 
 // @desc   Update profile for user
 // @route  Put /api/user/updateprofile
 // @access Public
-const updateProfileUser = asyncHandler(async (req, res)=> {
-  const { phone, address, avatar, email } = req.body
-  // check email exists
-  const isEmailExists = User.exists({ email })
-  if(isEmailExists && email != req.user.email){
-    return errorRespone(res, 409, 1, 'error', 'Email này đã tồn tại!')
-  }
-  // update profile user
-  try{
+const updateProfileUser = asyncHandler(async (req, res) => {
+  try {
+    const { phone, address, email } = req.body
+    // check email exists
+    const isEmailExists = User.exists({ email })
+    if (isEmailExists && email != req.user.email) {
+      return errorRespone(res, 409, 1, 'error', 'Email này đã tồn tại!')
+    }
+    // update profile user
     await User.findByIdAndUpdate(req.user._id, {
       phone,
       address,
-      avatar,
       email,
     })
     return res.status(200).json({
@@ -241,8 +242,26 @@ const updateProfileUser = asyncHandler(async (req, res)=> {
       msg: 'success',
       message: 'Cập nhật thành công!',
     })
-  }catch(error){
-    return errorRespone(res, 400, 1, 'error', error)
+  } catch (error) {
+    return errorRespone(res, 400, 0, 'error', error)
+  }
+})
+
+const updateAvatar = asyncHandler(async (req, res) => {
+  try {
+    const uploader = async (path) => await uploads(path, 'Images')
+    const newPath = await uploader(req.file.path)
+    const user = await User.findById(req.user._id)
+    user.avatar = newPath.url
+    await user.save()
+    res.status(200).json({
+      code: 1,
+      msg: 'success',
+      message: 'Cập nhật hình thành công',
+      data: newPath,
+    })
+  } catch (error) {
+    return errorRespone(res, 400, 0, 'error', error)
   }
 })
 
@@ -254,5 +273,6 @@ export {
   updateUser,
   updateUserPassword,
   updateProfileUser,
-  getProfileMe
+  getProfileMe,
+  updateAvatar,
 }

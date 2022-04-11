@@ -3,13 +3,15 @@ import dotenv from 'dotenv'
 import morgan from 'morgan'
 import connectDB from './config/db.js'
 import swaggerUi from 'swagger-ui-express'
-import { readFile } from 'fs/promises';
+import { readFile } from 'fs/promises'
 
 
 import cors from 'cors'
 import colors from 'colors'
 
-const swaggerDocument = JSON.parse(await readFile(new URL('./config/swagger.json', import.meta.url)));
+const swaggerDocument = JSON.parse(
+  await readFile(new URL('./config/swagger.json', import.meta.url))
+)
 
 import userRoutes from './routes/userRoutes.js'
 import yearRoutes from './routes/yearRoutes.js'
@@ -18,6 +20,7 @@ import activityDetailRoutes from './routes/activityDetailRoutes.js'
 
 dotenv.config()
 connectDB()
+
 
 // middlewares
 const app = express()

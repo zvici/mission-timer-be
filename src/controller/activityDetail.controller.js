@@ -43,8 +43,28 @@ const createActivityDetail = asyncHandler(async (req, res) => {
       },
     })
   } catch (error) {
-    return errorRespone(res, 404, 0, 'error', error)
+    return errorRespone(res, 400, 0, 'error', error)
   }
 })
 
-export { createActivityDetail }
+const getActivitiesDetailMe = asyncHandler(async (req, res) => {
+  try {
+    const activityDetail = await ActivityDetail.find({
+      assignee: req.user._id,
+    })
+      .populate('assignee', 'name')
+      .populate('activity', 'content startDate endDate')
+    return res.send({
+      code: 1,
+      msg: 'success',
+      message: 'Danh sách chi tiết hoạt động của bạn!',
+      data: {
+        activityDetail,
+      },
+    })
+  } catch (error) {
+    return errorRespone(res, 400, 0, 'error', error)
+  }
+})
+
+export { createActivityDetail, getActivitiesDetailMe }

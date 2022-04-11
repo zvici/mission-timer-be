@@ -25,6 +25,14 @@ const activityDetailSchema = mongoose.Schema({
     type: String,
     default: '',
   },
+  comments: {
+    type: String,
+    default: '',
+  },
+  taskMasterComment: {
+    type: String,
+    default: '',
+  },
 })
 
 const ActivityDetail = mongoose.model('ActivityDetail', activityDetailSchema)
