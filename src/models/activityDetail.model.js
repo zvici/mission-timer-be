@@ -11,6 +11,10 @@ const activityDetailSchema = mongoose.Schema({
     required: true,
     ref: 'User',
   },
+  description: {
+    type: String,
+    default: '',
+  },
   status: {
     type: String,
     require: true,
@@ -18,10 +22,6 @@ const activityDetailSchema = mongoose.Schema({
     default: 'not answered',
   },
   image: {
-    type: String,
-    default: '',
-  },
-  description: {
     type: String,
     default: '',
   },

@@ -1,5 +1,6 @@
 import asyncHandler from 'express-async-handler'
 import Activities from '../models/activity.model.js'
+import Year from '../models/year.model.js'
 import errorRespone from '../utils/errorRespone.js'
 
 // @desc   Create one Activity
@@ -65,4 +66,57 @@ const getActivities = asyncHandler(async (req, res) => {
   }
 })
 
-export { createActivity, getActivities }
+// @desc   Update activity
+// @route  Put /api/activity
+// @access Admin
+
+const updateActivity = asyncHandler(async (req, res) => {
+  const {
+    year,
+    content,
+    startDate,
+    endDate,
+    quota,
+    rollUpType,
+    specifiedTime,
+    status,
+    description,
+  } = req.body
+
+  try {
+    //Check activity exist
+    const activityExist = await Activities.findById(req.params.id)
+    if (!activityExist) {
+      return errorRespone(res, 404, 0, 'error', 'Hoạt động không tồn tại')
+    }
+
+    //Check year exist
+    const yearExist = await Year.findById(year)
+    if (!yearExist) {
+      return errorRespone(res, 404, 0, 'error', 'Năm học không tồn tại')
+    }
+
+    //Update activity
+    activityExist.year = year
+    activityExist.content = content
+    activityExist.startDate = content.startDate
+    activityExist.endDate = content.endDate
+    activityExist.quota = content.quota
+    activityExist.status = content.status
+    activityExist.description = content.description
+
+    const activity = await activityExist.save()
+    return res.json({
+      code: 1,
+      msg: 'success',
+      message: 'Cập nhật hoạt động thành công!',
+      data: {
+        activity,
+      },
+    })
+  } catch (error) {
+    return errorRespone(res, 400, 0, 'error', error)
+  }
+})
+
+export { createActivity, getActivities, updateActivity }

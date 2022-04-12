@@ -38,7 +38,7 @@ const admin = (req, res, next) => {
     return res.status(401).json({
       code: 0,
       msg: 'error',
-      message: 'Not authorized as an admin',
+      message: 'Not authorized as an ADMIN',
     })
   }
 }
