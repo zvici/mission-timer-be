@@ -12,7 +12,7 @@ router
   .route('/')
   .post(protect, admin, createActivity)
   .get(protect, admin, getActivities)
-
+router.route('/:fillter').get(protect, admin, getActivities)
 router.route('/:id').put(protect, admin, updateActivity)
 
 export default router

@@ -14,9 +14,8 @@ const createActivity = asyncHandler(async (req, res) => {
     endDate,
     quota,
     rollUpType,
-    specifiedTime,
-    status,
     description,
+    location,
   } = req.body
 
   try {
@@ -27,9 +26,8 @@ const createActivity = asyncHandler(async (req, res) => {
       endDate,
       quota,
       rollUpType,
-      specifiedTime,
-      status,
       description,
+      location,
       taskMaster: req.user._id,
     })
     const activity = await newActivity.save()
@@ -52,7 +50,9 @@ const createActivity = asyncHandler(async (req, res) => {
 
 const getActivities = asyncHandler(async (req, res) => {
   try {
-    const activities = await Activities.find().populate('taskMaster', 'name')
+    const activities = await Activities.find({
+      rollUpType: { $in: req.params.fillter.split(',') },
+    }).populate('taskMaster', 'name')
     return res.send({
       code: 1,
       msg: 'success',
