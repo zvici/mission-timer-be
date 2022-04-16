@@ -15,6 +15,10 @@ const activityDetailSchema = mongoose.Schema({
     type: String,
     default: '',
   },
+  quota: {
+    type: Number,
+    default: 0,
+  },
   status: {
     type: String,
     require: true,

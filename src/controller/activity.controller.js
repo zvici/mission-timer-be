@@ -12,10 +12,8 @@ const createActivity = asyncHandler(async (req, res) => {
     content,
     startDate,
     endDate,
-    quota,
     rollUpType,
     description,
-    location,
   } = req.body
 
   try {
@@ -24,10 +22,8 @@ const createActivity = asyncHandler(async (req, res) => {
       content,
       startDate,
       endDate,
-      quota,
       rollUpType,
       description,
-      location,
       taskMaster: req.user._id,
     })
     const activity = await newActivity.save()
@@ -49,12 +45,13 @@ const createActivity = asyncHandler(async (req, res) => {
 // @access Admin
 
 const getActivities = asyncHandler(async (req, res) => {
+  console.log(req.params.fillter.split(','))
   try {
     const activities = await Activities.find({
       rollUpType: { $in: req.params.fillter.split(',') },
     }).populate('taskMaster', 'name')
     return res.send({
-      code: 1,
+      code: 1,  
       msg: 'success',
       message: 'Danh sách hoạt động',
       data: {
@@ -76,10 +73,7 @@ const updateActivity = asyncHandler(async (req, res) => {
     content,
     startDate,
     endDate,
-    quota,
     rollUpType,
-    specifiedTime,
-    status,
     description,
   } = req.body
 
@@ -101,8 +95,6 @@ const updateActivity = asyncHandler(async (req, res) => {
     activityExist.content = content
     activityExist.startDate = content.startDate
     activityExist.endDate = content.endDate
-    activityExist.quota = content.quota
-    activityExist.status = content.status
     activityExist.description = content.description
 
     const activity = await activityExist.save()

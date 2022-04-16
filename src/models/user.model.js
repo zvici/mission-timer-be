@@ -7,12 +7,10 @@ const userSchema = mongoose.Schema(
       type: String,
       required: true,
     },
-
     userId: {
       type: String,
       required: true,
     },
-
     password: {
       type: String,
       required: true,
@@ -20,6 +18,10 @@ const userSchema = mongoose.Schema(
     department: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Department',
+    },
+    subject: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Subject',
     },
     role: {
       type: String,
@@ -31,7 +33,6 @@ const userSchema = mongoose.Schema(
       type: String,
       required: true,
     },
-
     isActive: {
       type: Boolean,
       required: true,
@@ -41,9 +42,18 @@ const userSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    phone: String,
-    address: String,
-    avatar: String,
+    phone: {
+      type: String,
+      default: '',
+    },
+    address: {
+      type: String,
+      default: '',
+    },
+    avatar: {
+      type: String,
+      default: '',
+    },
   },
   { timestamps: true }
 )

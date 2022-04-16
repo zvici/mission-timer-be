@@ -26,14 +26,6 @@ const activitySchema = mongoose.Schema(
       required: true,
       ref: 'User',
     },
-    location: {
-      type: String,
-      default: '',
-    },
-    quota: {
-      type: Number,
-      required: true,
-    },
     rollUpType: {
       type: String,
       enum: ['STAFF', 'ACADEMIC_STAFF', 'MONITOR_EXAM'],

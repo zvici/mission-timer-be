@@ -4,11 +4,8 @@ import color from 'colors'
 
 import users from './data/user.js'
 import User from './models/user.model.js'
-import departments from './data/department.js'
-import Departments from './models/department.model.js'
 
 import connectDB from './config/db.js'
-
 dotenv.config()
 
 connectDB()

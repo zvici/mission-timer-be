@@ -47,6 +47,11 @@ const createActivityDetail = asyncHandler(async (req, res) => {
   }
 })
 
+
+// @desc   Get avtivities of me
+// @route  Get /api/activity-detail/me
+// @access Admin
+
 const getActivitiesDetailMe = asyncHandler(async (req, res) => {
   try {
     const activityDetail = await ActivityDetail.find({
