@@ -225,10 +225,11 @@ const getProfileMe = asyncHandler(async (req, res) => {
 const updateProfileUser = asyncHandler(async (req, res) => {
   try {
     const { phone, address, email } = req.body
-    // check email exists
-    const isEmailExists = User.exists({ email })
-    if (isEmailExists && email != req.user.email) {
-      return errorRespone(res, 409, 1, 'error', 'Email này đã tồn tại!')
+    if (email !== req.user.email) {
+      const isEmailExists = await User.exists({ email })
+      if (isEmailExists) {
+        return errorRespone(res, 409, 1, 'error', 'Email này đã tồn tại!')
+      }
     }
     // update profile user
     await User.findByIdAndUpdate(req.user._id, {
