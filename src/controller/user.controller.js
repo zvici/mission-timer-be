@@ -194,6 +194,7 @@ const updateUserPassword = asyncHandler(async (req, res) => {
   // upadate password
   try {
     user.password = newPassword
+    user.isPasswordChanged = true
     await user.save()
     return res.status(200).json({
       code: 1,
