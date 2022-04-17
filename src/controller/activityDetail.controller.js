@@ -72,4 +72,6 @@ const getActivitiesDetailMe = asyncHandler(async (req, res) => {
   }
 })
 
+
+
 export { createActivityDetail, getActivitiesDetailMe }

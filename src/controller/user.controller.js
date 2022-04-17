@@ -226,6 +226,7 @@ const getProfileMe = asyncHandler(async (req, res) => {
 const updateProfileUser = asyncHandler(async (req, res) => {
   try {
     const { phone, address, email } = req.body
+    console.log(email, req.user.email )
     if (email !== req.user.email) {
       const isEmailExists = await User.exists({ email })
       if (isEmailExists) {

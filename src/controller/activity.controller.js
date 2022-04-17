@@ -93,10 +93,10 @@ const updateActivity = asyncHandler(async (req, res) => {
     //Update activity
     activityExist.year = year
     activityExist.content = content
-    activityExist.startDate = content.startDate
-    activityExist.endDate = content.endDate
-    activityExist.description = content.description
-
+    activityExist.startDate = startDate
+    activityExist.endDate = endDate
+    activityExist.description = description
+    activityExist.rollUpType = rollUpType
     const activity = await activityExist.save()
     return res.json({
       code: 1,
