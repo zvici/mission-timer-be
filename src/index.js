@@ -15,7 +15,7 @@ const swaggerDocument = JSON.parse(
 import userRoutes from './routes/userRoutes.js'
 import yearRoutes from './routes/yearRoutes.js'
 import activityRoutes from './routes/activityRoutes.js'
-import activityDetailRoutes from './routes/activityDetailRoutes.js'
+import taskRoutes from './routes/taskRoutes.js'
 import statisticalRoutes from './routes/statisticalRoutes.js'
 
 dotenv.config()
@@ -43,7 +43,7 @@ app.use('/api/year', yearRoutes)
 // app.use('/api/subject', routes.subject)
 app.use('/api/statistical', statisticalRoutes)
 app.use('/api/activity', activityRoutes)
-app.use('/api/activity-detail', activityDetailRoutes)
+app.use('/api/task', taskRoutes)
 
 app.get('/', (req, res) => {
   res.send({

@@ -2,11 +2,15 @@ import mongoose from 'mongoose'
 
 const activitySchema = mongoose.Schema(
   {
-    content: {
+    title: {
       type: String,
       required: true,
     },
     description: {
+      type: String,
+      default: '',
+    },
+    quota: {
       type: String,
       default: '',
     },
@@ -15,25 +19,18 @@ const activitySchema = mongoose.Schema(
       required: true,
       ref: 'Year',
     },
-    startDate: {
-      type: Date,
-    },
-    endDate: {
-      type: Date,
-    },
-    taskMaster: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      ref: 'User',
-    },
-    rollUpType: {
+    type: {
       type: String,
       enum: ['STAFF', 'ACADEMIC_STAFF', 'MONITOR_EXAM'],
       required: true,
     },
-    status: {
-      type: String,
-      default: 'active',
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
+    updatedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
     },
   },
   { timestamps: true }

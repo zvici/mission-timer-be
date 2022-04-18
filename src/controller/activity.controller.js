@@ -7,24 +7,16 @@ import errorRespone from '../utils/errorRespone.js'
 // @route  POST /api/activity
 // @access Admin
 const createActivity = asyncHandler(async (req, res) => {
-  const {
-    year,
-    content,
-    startDate,
-    endDate,
-    rollUpType,
-    description,
-  } = req.body
+  const { title, description, quota, year, type } = req.body
 
   try {
     const newActivity = await new Activities({
-      year,
-      content,
-      startDate,
-      endDate,
-      rollUpType,
+      title,
       description,
-      taskMaster: req.user._id,
+      quota,
+      year,
+      type,
+      createdBy: req.user._id,
     })
     const activity = await newActivity.save()
     return res.json({
@@ -45,15 +37,16 @@ const createActivity = asyncHandler(async (req, res) => {
 // @access Admin
 
 const getActivities = asyncHandler(async (req, res) => {
-  console.log(req.params.fillter.split(','))
   try {
     const activities = await Activities.find({
-      rollUpType: { $in: req.params.fillter.split(',') },
-    }).populate('taskMaster', 'name')
+      type: { $in: req.params.fillter.split(',') },
+    })
+      .populate('createdBy', 'name')
+      .populate('createdBy', 'name')
     return res.send({
-      code: 1,  
+      code: 1,
       msg: 'success',
-      message: 'Danh sách hoạt động',
+      message: 'Danh sách nội dung công tác khác',
       data: {
         activities,
       },
@@ -68,14 +61,7 @@ const getActivities = asyncHandler(async (req, res) => {
 // @access Admin
 
 const updateActivity = asyncHandler(async (req, res) => {
-  const {
-    year,
-    content,
-    startDate,
-    endDate,
-    rollUpType,
-    description,
-  } = req.body
+  const { title, description, quota, year, type } = req.body
 
   try {
     //Check activity exist
@@ -91,17 +77,18 @@ const updateActivity = asyncHandler(async (req, res) => {
     }
 
     //Update activity
-    activityExist.year = year
-    activityExist.content = content
-    activityExist.startDate = startDate
-    activityExist.endDate = endDate
+    activityExist.title = title
     activityExist.description = description
-    activityExist.rollUpType = rollUpType
+    activityExist.quota = quota
+    activityExist.year = year
+    activityExist.type = type
+    activityExist.updatedBy = req.user._id
+
     const activity = await activityExist.save()
     return res.json({
       code: 1,
       msg: 'success',
-      message: 'Cập nhật hoạt động thành công!',
+      message: 'Cập nhật nội dung công tác khác thành công!',
       data: {
         activity,
       },

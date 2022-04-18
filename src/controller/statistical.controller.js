@@ -1,11 +1,11 @@
 import asyncHandler from 'express-async-handler'
-import ActivityDetail from '../models/activityDetail.model.js'
+import Task from '../models/task.model.js'
 import User from '../models/user.model.js'
 import errorRespone from '../utils/errorRespone.js'
 import { countStatusActivity, sumQuota } from '../utils/statisticalFunction.js'
 const activityUsersStatistics = asyncHandler(async (req, res) => {
   try {
-    const result = await ActivityDetail.find()
+    const result = await Task.find()
       .select('quota status')
       .populate({
         path: 'activity',
