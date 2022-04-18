@@ -31,7 +31,7 @@ const createContent = asyncHandler(async (req, res) => {
 // @access Academic staff
 const getContents = asyncHandler(async (req, res) => {
   try {
-    const contents = await Content.find({}).populate('updatedBy', 'name')
+    const contents = await Content.find({}).populate('createdBy', 'name').populate('updatedBy', 'name')
     res.send({
       code: 1,
       msg: 'success',
@@ -50,8 +50,8 @@ const getContents = asyncHandler(async (req, res) => {
 // @access Academic staff
 const updateContent = asyncHandler(async (req, res) => {
   try {
-    const { title, description } = await Content.find
-    const isContentExist = await Content.findById(res.params.id)
+    const { title, description } = req.body
+    const isContentExist = await Content.findById(req.params.id)
     if (!isContentExist) {
       return errorRespone(
         res,
@@ -84,7 +84,7 @@ const updateContent = asyncHandler(async (req, res) => {
 // @access Academic staff
 const deleteContent = asyncHandler(async (req, res) => {
   try {
-    const isContentExist = await Content.findById(res.params.id)
+    const isContentExist = await Content.findById(req.params.id)
     if (!isContentExist) {
       return errorRespone(
         res,
@@ -94,7 +94,7 @@ const deleteContent = asyncHandler(async (req, res) => {
         'Không tìm thấy nội dung hoạt động này!'
       )
     }
-    await Content.deleteOne({ id: res.params.id })
+    await Content.deleteOne({ _id: req.params.id })
     res.send({
       code: 1,
       msg: 'success',

@@ -2,6 +2,7 @@ import { protect, admin } from '../middlewares/authMiddleware.js'
 import express from 'express'
 import {
   createContent,
+  deleteContent,
   getContents,
   updateContent,
 } from '../controller/content.controller.js'
@@ -15,6 +16,6 @@ router
 router
   .route('/:id')
   .put(protect, admin, updateContent)
-  .delete(protect, admin, updateContent)
+  .delete(protect, admin, deleteContent)
 
 export default router
