@@ -31,7 +31,7 @@ const createContent = asyncHandler(async (req, res) => {
 // @access Academic staff
 const getContents = asyncHandler(async (req, res) => {
   try {
-    const contents = await Content.find({})
+    const contents = await Content.find({}).populate('updatedBy', 'name')
     res.send({
       code: 1,
       msg: 'success',
@@ -64,7 +64,7 @@ const updateContent = asyncHandler(async (req, res) => {
 
     isContentExist.title = title
     isContentExist.description = description
-    isContentExist.createdBy = req.user._id
+    isContentExist.updatedBy = req.user._id
     const updateContent = await isContentExist.save()
     res.send({
       code: 1,
