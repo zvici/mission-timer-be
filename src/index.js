@@ -17,6 +17,7 @@ import yearRoutes from './routes/yearRoutes.js'
 import activityRoutes from './routes/activityRoutes.js'
 import taskRoutes from './routes/taskRoutes.js'
 import statisticalRoutes from './routes/statisticalRoutes.js'
+import contentRoutes from './routes/contentRoutes.js'
 
 dotenv.config()
 connectDB()
@@ -40,7 +41,7 @@ app.use(
 app.use('/api/user', userRoutes)
 // app.use('/api/department', routes.department)
 app.use('/api/year', yearRoutes)
-// app.use('/api/subject', routes.subject)
+app.use('/api/content', contentRoutes)
 app.use('/api/statistical', statisticalRoutes)
 app.use('/api/activity', activityRoutes)
 app.use('/api/task', taskRoutes)
