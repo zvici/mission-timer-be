@@ -47,7 +47,6 @@ const createActivityDetail = asyncHandler(async (req, res) => {
   }
 })
 
-
 // @desc   Get avtivities of me
 // @route  Get /api/activity-detail/me
 // @access Admin
@@ -72,6 +71,42 @@ const getActivitiesDetailMe = asyncHandler(async (req, res) => {
   }
 })
 
+// @desc   Update ActivityDetail
+// @route  Put /api/activity-detail/me
+// @access ACADEMIC_STAFF, STAFF
 
+const updateActivityDetailMe = asyncHandler(async (req, res) => {
+  try {
+    const { id, description, quota, status, comments } = req.body
+    const isActivityDetailExist = await ActivityDetail.findById(id)
+    // Check activity detail exist
+    if (!isActivityDetailExist) {
+      return errorRespone(res, 404, 0, 'error', 'Không tìm thấy hoạt động này!')
+    }
+    // Check assignee = id user request 
+    if (
+      !(isActivityDetailExist.assignee.toString() === req.user._id.toString())
+    ) {
+      return errorRespone(res, 401, 0, 'error', 'Bạn không có quyền!')
+    }
+    // Update activity detail
+    isActivityDetailExist.description = description
+    isActivityDetailExist.quota = quota
+    isActivityDetailExist.status = status
+    isActivityDetailExist.comments = comments
 
-export { createActivityDetail, getActivitiesDetailMe }
+    const updateActivityDetail = await isActivityDetailExist.save()
+    return res.send({
+      code: 1,
+      msg: 'success',
+      message: 'Đã cập nhật!',
+      data: {
+        updateActivityDetail,
+      },
+    })
+  } catch (error) {
+    return errorRespone(res, 400, 0, 'error', error)
+  }
+})
+
+export { createActivityDetail, getActivitiesDetailMe, updateActivityDetailMe }

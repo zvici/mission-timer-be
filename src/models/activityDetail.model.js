@@ -22,8 +22,8 @@ const activityDetailSchema = mongoose.Schema({
   status: {
     type: String,
     require: true,
-    enum: ['accept', 'refuse', 'attended', 'not answered', 'not engaged'],
-    default: 'not answered',
+    enum: ['accept', 'refuse', 'attended', 'notAnswered', 'notEngaged'],
+    default: 'notAnswered',
   },
   image: {
     type: String,
