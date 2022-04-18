@@ -22,6 +22,7 @@ import contentRoutes from './routes/contentRoutes.js'
 dotenv.config()
 connectDB()
 
+
 // middlewares
 const app = express()
 app.use(morgan('combined'))
