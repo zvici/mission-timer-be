@@ -5,7 +5,6 @@ import connectDB from './config/db.js'
 import swaggerUi from 'swagger-ui-express'
 import { readFile } from 'fs/promises'
 
-
 import cors from 'cors'
 import colors from 'colors'
 
@@ -17,10 +16,10 @@ import userRoutes from './routes/userRoutes.js'
 import yearRoutes from './routes/yearRoutes.js'
 import activityRoutes from './routes/activityRoutes.js'
 import activityDetailRoutes from './routes/activityDetailRoutes.js'
+import statisticalRoutes from './routes/statisticalRoutes.js'
 
 dotenv.config()
 connectDB()
-
 
 // middlewares
 const app = express()
@@ -42,7 +41,7 @@ app.use('/api/user', userRoutes)
 // app.use('/api/department', routes.department)
 app.use('/api/year', yearRoutes)
 // app.use('/api/subject', routes.subject)
-// app.use('/api/otp', routes.otp)
+app.use('/api/statistical', statisticalRoutes)
 app.use('/api/activity', activityRoutes)
 app.use('/api/activity-detail', activityDetailRoutes)
 
