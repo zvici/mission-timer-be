@@ -118,14 +118,51 @@ const getTasksMe = asyncHandler(async (req, res) => {
 })
 
 // @desc   Update Task
-// @route  Put /api/activity-detail/me
+// @route  Put /api/task/:id
 // @access MINISTRY, STAFF
 
-const updateTaskMe = asyncHandler(async (req, res) => {
+const updateTask = asyncHandler(async (req, res) => {
   try {
+    const { activity, description, startDate, endDate, officeHours } = req.body
+    //Check task exist
+    const taskExist = await Task.findById(req.params.id)
+    if (!taskExist) {
+      return errorRespone(res, 404, 0, 'error', 'Không tìm thấy task này!')
+    }
+    //Check activity exist
+    const activityExist = await Activities.findById(activity)
+    if (!activityExist) {
+      return errorRespone(res, 404, 0, 'error', 'Không tìm thấy hoạt động này!')
+    }
+    //Check role
+    if (req.user.role === 'STAFF' && activityExist.type !== 'STAFF') {
+      return errorRespone(
+        res,
+        403,
+        0,
+        'error',
+        'Bạn không được chọn hoạt động này!'
+      )
+    }
+
+    taskExist.activity = activity
+    taskExist.description = description
+    taskExist.startDate = startDate
+    taskExist.endDate = endDate
+    taskExist.officeHours = officeHours
+
+    const saveTask = await taskExist.save()
+    return res.send({
+      code: 1,
+      msg: 'success',
+      message: 'Đã cập nhật task',
+      data: {
+        task: saveTask,
+      },
+    })
   } catch (error) {
     return errorRespone(res, 400, 0, 'error', error)
   }
 })
 
-export { createTask, getTasksMe, updateTaskMe }
+export { createTask, getTasksMe, updateTask }

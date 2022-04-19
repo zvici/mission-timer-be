@@ -3,8 +3,6 @@ import User from '../models/user.model.js'
 import generateToken from '../utils/generateToken.js'
 import jwt from 'jsonwebtoken'
 import errorRespone from '../utils/errorRespone.js'
-import formidable from 'formidable'
-import cloudinary from '../config/cloudinary.config.js'
 import uploads from '../config/cloudinary.config.js'
 
 // @desc   Auth admin and get token
@@ -226,7 +224,6 @@ const getProfileMe = asyncHandler(async (req, res) => {
 const updateProfileUser = asyncHandler(async (req, res) => {
   try {
     const { phone, address, email } = req.body
-    console.log(email, req.user.email )
     if (email !== req.user.email) {
       const isEmailExists = await User.exists({ email })
       if (isEmailExists) {
