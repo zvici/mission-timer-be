@@ -3,6 +3,11 @@ import mongoose from 'mongoose'
 const participantsSchema = mongoose.Schema(
   {
     task: { type: mongoose.Schema.Types.ObjectId, ref: 'Task' },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: 'User',
+    },
     status: {
       type: String,
       require: true,

@@ -26,7 +26,7 @@ const activitySchema = mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ['STAFF', 'ACADEMIC_STAFF', 'MONITOR_EXAM'],
+      enum: ['STAFF', 'MINISTRY', 'MONITOR_EXAM'],
       required: true,
     },
     createdBy: {

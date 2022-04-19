@@ -14,7 +14,7 @@ const users = [
     name: 'Phan Thị Hồng Nhi',
     userId: '00002',
     password: bcrypt.hashSync('123456', 10),
-    role: 'ACADEMIC_STAFF',
+    role: 'MINISTRY',
     email: 'hongnhi@gmail.com',
     phone: '0334664242',
     address: 'TP HCM',

@@ -1,7 +1,7 @@
 import asyncHandler from 'express-async-handler'
 import Activities from '../models/activity.model.js'
+import Participants from '../models/participants.model.js'
 import Task from '../models/task.model.js'
-import User from '../models/user.model.js'
 import errorRespone from '../utils/errorRespone.js'
 
 // @desc   Create one Task
@@ -9,39 +9,65 @@ import errorRespone from '../utils/errorRespone.js'
 // @access Admin
 
 const createTask = asyncHandler(async (req, res) => {
-  const { activity, assignee } = req.body
   try {
+    const {
+      activity,
+      description,
+      startDate,
+      endDate,
+      officeHours,
+      listOfParticipants,
+    } = req.body
     //Check activity exist
     const activityExist = await Activities.findById(activity)
     if (!activityExist) {
       return errorRespone(res, 404, 0, 'error', 'Không tìm thấy hoạt động này!')
     }
-    //Check user exist
-    const userExits = await User.findById(assignee)
-    if (!userExits) {
+    if (
+      req.user.role.toString() === 'STAFF' &&
+      activityExist.type.toString() === 'MINISTRY'
+    ) {
       return errorRespone(
         res,
-        404,
+        403,
         0,
         'error',
-        'Không tìm thấy người dùng này!'
+        'Bạn không có quyền tạo task với hoạt động này!'
       )
     }
     // Create Activity Detail
-
     const newTask = await new Task({
       activity,
-      assignee,
+      description,
+      startDate,
+      endDate,
+      officeHours,
+      createdBy: req.user._id,
     })
     const saveTask = await newTask.save()
-    return res.send({
-      code: 1,
-      msg: 'success',
-      message: 'Đã tạo công việc!',
-      data: {
-        task: saveTask,
-      },
-    })
+    let participants
+    // if user create Task
+    if (
+      activityExist.type.toString() === 'STAFF' &&
+      req.user.role.toString() === 'STAFF'
+    ) {
+      // Create new participants
+      participants = await new Participants({
+        task: saveTask._id.toString(),
+        user: req.user._id.toString(),
+      })
+    }
+    // if admin and Ministry create task
+    if (req.user.role.toString() === 'ADMIN' || req.user.role.toString() === 'MINISTRY')
+      return res.send({
+        code: 1,
+        msg: 'success',
+        message: 'Đã tạo task!',
+        data: {
+          task: saveTask,
+          participants,
+        },
+      })
   } catch (error) {
     return errorRespone(res, 400, 0, 'error', error)
   }
@@ -53,19 +79,6 @@ const createTask = asyncHandler(async (req, res) => {
 
 const getActivitiesDetailMe = asyncHandler(async (req, res) => {
   try {
-    const task = await Task.find({
-      assignee: req.user._id,
-    })
-      .populate('assignee', 'name')
-      .populate('activity', 'content description startDate endDate')
-    return res.send({
-      code: 1,
-      msg: 'success',
-      message: 'Danh sách chi tiết hoạt động của bạn!',
-      data: {
-        task,
-      },
-    })
   } catch (error) {
     return errorRespone(res, 400, 0, 'error', error)
   }
@@ -73,37 +86,10 @@ const getActivitiesDetailMe = asyncHandler(async (req, res) => {
 
 // @desc   Update Task
 // @route  Put /api/activity-detail/me
-// @access ACADEMIC_STAFF, STAFF
+// @access MINISTRY, STAFF
 
 const updateTaskMe = asyncHandler(async (req, res) => {
   try {
-    const { id, description, quota, status, comments } = req.body
-    const isTaskExist = await Task.findById(id)
-    // Check activity detail exist
-    if (!isTaskExist) {
-      return errorRespone(res, 404, 0, 'error', 'Không tìm thấy hoạt động này!')
-    }
-    // Check assignee = id user request 
-    if (
-      !(isTaskExist.assignee.toString() === req.user._id.toString())
-    ) {
-      return errorRespone(res, 401, 0, 'error', 'Bạn không có quyền!')
-    }
-    // Update activity detail
-    isTaskExist.description = description
-    isTaskExist.quota = quota
-    isTaskExist.status = status
-    isTaskExist.comments = comments
-
-    const updateTask = await isTaskExist.save()
-    return res.send({
-      code: 1,
-      msg: 'success',
-      message: 'Đã cập nhật!',
-      data: {
-        updateTask,
-      },
-    })
   } catch (error) {
     return errorRespone(res, 400, 0, 'error', error)
   }

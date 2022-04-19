@@ -43,16 +43,16 @@ const admin = (req, res, next) => {
   }
 }
 
-const academicStaff = (req, res, next) => {
-  if (req.user && req.user.role === 'ACADEMIC_STAFF') {
+const ministry = (req, res, next) => {
+  if (req.user && req.user.role === 'MINISTRY') {
     next()
   } else {
     return res.status(401).json({
       code: 0,
       msg: 'error',
-      message: 'Not authorized as an ACADEMIC STAFF',
+      message: 'Not authorized as an MINISTRY',
     })
   }
 }
 
-export { protect, admin, academicStaff }
+export { protect, admin, ministry }

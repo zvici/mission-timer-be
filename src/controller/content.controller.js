@@ -4,7 +4,7 @@ import errorRespone from '../utils/errorRespone.js'
 
 // @desc   Create one content
 // @route  POST /api/content
-// @access Academic staff
+// @access Ministry
 const createContent = asyncHandler(async (req, res) => {
   try {
     const { title, description } = req.body
@@ -28,7 +28,7 @@ const createContent = asyncHandler(async (req, res) => {
 })
 // @desc   get list contents
 // @route  GET /api/content
-// @access Academic staff
+// @access Ministry
 const getContents = asyncHandler(async (req, res) => {
   try {
     const contents = await Content.find({}).populate('createdBy', 'name').populate('updatedBy', 'name')
@@ -47,7 +47,7 @@ const getContents = asyncHandler(async (req, res) => {
 
 // @desc   update one content
 // @route  PUT /api/content/:id
-// @access Academic staff
+// @access Ministry
 const updateContent = asyncHandler(async (req, res) => {
   try {
     const { title, description } = req.body
@@ -81,7 +81,7 @@ const updateContent = asyncHandler(async (req, res) => {
 
 // @desc   delete one content
 // @route  DELETE /api/content/:id
-// @access Academic staff
+// @access Ministry
 const deleteContent = asyncHandler(async (req, res) => {
   try {
     const isContentExist = await Content.findById(req.params.id)
