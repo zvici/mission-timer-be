@@ -14,6 +14,11 @@ const activitySchema = mongoose.Schema(
       type: String,
       default: '',
     },
+    content: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: 'Content',
+    },
     year: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,

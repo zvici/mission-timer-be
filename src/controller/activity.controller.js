@@ -2,18 +2,29 @@ import asyncHandler from 'express-async-handler'
 import Activities from '../models/activity.model.js'
 import Year from '../models/year.model.js'
 import errorRespone from '../utils/errorRespone.js'
+import Content from '../models/content.model.js'
 
 // @desc   Create one Activity
 // @route  POST /api/activity
 // @access Admin
 const createActivity = asyncHandler(async (req, res) => {
-  const { title, description, quota, year, type } = req.body
-
   try {
+    const { title, description, quota, year, content, type } = req.body
+    //Check year exist
+    const yearExist = await Year.findById(year)
+    if (!yearExist) {
+      return errorRespone(res, 404, 0, 'error', 'Năm học không tồn tại')
+    }
+     //Check content exist
+    const contentExist = await Content.findById(content)
+    if (!contentExist) {
+      return errorRespone(res, 404, 0, 'error', 'Nội dung này không tồn tại!')
+    }
     const newActivity = await new Activities({
       title,
       description,
       quota,
+      content,
       year,
       type,
       createdBy: req.user._id,
@@ -38,15 +49,13 @@ const createActivity = asyncHandler(async (req, res) => {
 
 const getActivities = asyncHandler(async (req, res) => {
   try {
-    const activities = await Activities.find({
-      type: { $in: req.params.fillter.split(',') },
-    })
+    const activities = await Activities.find({})
       .populate('createdBy', 'name')
-      .populate('createdBy', 'name')
+      .populate('updatedBy', 'name')
     return res.send({
       code: 1,
       msg: 'success',
-      message: 'Danh sách nội dung công tác khác',
+      message: 'Danh sách hoạt độnh công tác khác',
       data: {
         activities,
       },
@@ -61,7 +70,7 @@ const getActivities = asyncHandler(async (req, res) => {
 // @access Admin
 
 const updateActivity = asyncHandler(async (req, res) => {
-  const { title, description, quota, year, type } = req.body
+  const { title, description, quota, content, year, type } = req.body
 
   try {
     //Check activity exist
@@ -69,17 +78,22 @@ const updateActivity = asyncHandler(async (req, res) => {
     if (!activityExist) {
       return errorRespone(res, 404, 0, 'error', 'Hoạt động không tồn tại')
     }
-
     //Check year exist
     const yearExist = await Year.findById(year)
     if (!yearExist) {
       return errorRespone(res, 404, 0, 'error', 'Năm học không tồn tại')
     }
+     //Check content exist
+     const contentExist = await Content.findById(content)
+     if (!contentExist) {
+       return errorRespone(res, 404, 0, 'error', 'Nội dung này không tồn tại!')
+     }
 
     //Update activity
     activityExist.title = title
     activityExist.description = description
     activityExist.quota = quota
+    activityExist.content = content
     activityExist.year = year
     activityExist.type = type
     activityExist.updatedBy = req.user._id
