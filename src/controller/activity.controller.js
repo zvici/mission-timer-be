@@ -58,7 +58,31 @@ const getActivities = asyncHandler(async (req, res) => {
     return res.send({
       code: 1,
       msg: 'success',
-      message: 'Danh sách hoạt độnh công tác khác',
+      message: 'Danh sách hoạt động công tác khác',
+      data: {
+        activities,
+      },
+    })
+  } catch (error) {
+    return errorRespone(res, 400, 0, 'error', error)
+  }
+})
+
+// @desc   Get list activity by year
+// @route  Get /api/activity/year/:year
+// @access Admin
+
+const getActivitiesByYear = asyncHandler(async (req, res) => {
+  try {
+    const activities = await Activities.find({ year: req.params.year })
+      .populate('year', 'name')
+      .populate('content', 'title')
+      .populate('createdBy', 'name')
+      .populate('updatedBy', 'name')
+    return res.send({
+      code: 1,
+      msg: 'success',
+      message: 'Danh sách hoạt động công tác khác',
       data: {
         activities,
       },
@@ -142,4 +166,4 @@ const deleteActivity = asyncHandler(async (req, res) => {
   }
 })
 
-export { createActivity, getActivities, updateActivity, deleteActivity }
+export { createActivity, getActivities, updateActivity, deleteActivity, getActivitiesByYear }
