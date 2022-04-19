@@ -3,6 +3,7 @@ import Activities from '../models/activity.model.js'
 import Year from '../models/year.model.js'
 import errorRespone from '../utils/errorRespone.js'
 import Content from '../models/content.model.js'
+import Task from '../models/task.model.js'
 
 // @desc   Create one Activity
 // @route  POST /api/activity
@@ -15,7 +16,7 @@ const createActivity = asyncHandler(async (req, res) => {
     if (!yearExist) {
       return errorRespone(res, 404, 0, 'error', 'Năm học không tồn tại')
     }
-     //Check content exist
+    //Check content exist
     const contentExist = await Content.findById(content)
     if (!contentExist) {
       return errorRespone(res, 404, 0, 'error', 'Nội dung này không tồn tại!')
@@ -50,6 +51,8 @@ const createActivity = asyncHandler(async (req, res) => {
 const getActivities = asyncHandler(async (req, res) => {
   try {
     const activities = await Activities.find({})
+      .populate('year', 'name')
+      .populate('content', 'title')
       .populate('createdBy', 'name')
       .populate('updatedBy', 'name')
     return res.send({
@@ -66,7 +69,7 @@ const getActivities = asyncHandler(async (req, res) => {
 })
 
 // @desc   Update activity
-// @route  Put /api/activity
+// @route  Put /api/activity:id
 // @access Admin
 
 const updateActivity = asyncHandler(async (req, res) => {
@@ -83,11 +86,11 @@ const updateActivity = asyncHandler(async (req, res) => {
     if (!yearExist) {
       return errorRespone(res, 404, 0, 'error', 'Năm học không tồn tại')
     }
-     //Check content exist
-     const contentExist = await Content.findById(content)
-     if (!contentExist) {
-       return errorRespone(res, 404, 0, 'error', 'Nội dung này không tồn tại!')
-     }
+    //Check content exist
+    const contentExist = await Content.findById(content)
+    if (!contentExist) {
+      return errorRespone(res, 404, 0, 'error', 'Nội dung này không tồn tại!')
+    }
 
     //Update activity
     activityExist.title = title
@@ -112,4 +115,31 @@ const updateActivity = asyncHandler(async (req, res) => {
   }
 })
 
-export { createActivity, getActivities, updateActivity }
+// @desc   Delete activity
+// @route  Put /api/activity:id
+// @access Admin
+
+const deleteActivity = asyncHandler(async (req, res) => {
+  try {
+    //Check activity exist
+    const activityExist = await Activities.findById(req.params.id)
+    if (!activityExist) {
+      return errorRespone(res, 404, 0, 'error', 'Hoạt động không tồn tại')
+    }
+    //Check activity exist in task
+    const activityExistTask = await Task.find({ activity: req.params.id })
+    if (!activityExistTask) {
+      return errorRespone(res, 400, 0, 'error', 'Không được xóa hoạt dộng này')
+    }
+    await activityExist.deleteOne({ _id: req.params.id })
+    return res.json({
+      code: 1,
+      msg: 'success',
+      message: 'Đã xóa hoạt động này',
+    })
+  } catch (error) {
+    return errorRespone(res, 400, 0, 'error', error)
+  }
+})
+
+export { createActivity, getActivities, updateActivity, deleteActivity }
