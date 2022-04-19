@@ -126,7 +126,7 @@ const deleteActivity = asyncHandler(async (req, res) => {
     if (!activityExist) {
       return errorRespone(res, 404, 0, 'error', 'Hoạt động không tồn tại')
     }
-    //Check activity exist in task
+    //Check activity exist in task ne
     const activityExistTask = await Task.find({ activity: req.params.id })
     if (!activityExistTask) {
       return errorRespone(res, 400, 0, 'error', 'Không được xóa hoạt dộng này')
