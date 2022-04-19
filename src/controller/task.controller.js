@@ -129,6 +129,13 @@ const updateTask = asyncHandler(async (req, res) => {
     if (!taskExist) {
       return errorRespone(res, 404, 0, 'error', 'Không tìm thấy task này!')
     }
+    //Check role
+    if (
+      req.user.role === 'STAFF' &&
+      taskExist.createdBy.toString() !== req.user._id
+    ) {
+      return errorRespone(res, 403, 0, 'error', 'Không được phép!')
+    }
     //Check activity exist
     const activityExist = await Activities.findById(activity)
     if (!activityExist) {
@@ -150,6 +157,7 @@ const updateTask = asyncHandler(async (req, res) => {
     taskExist.startDate = startDate
     taskExist.endDate = endDate
     taskExist.officeHours = officeHours
+    taskExist.updatedBy = req.user._id
 
     const saveTask = await taskExist.save()
     return res.send({
