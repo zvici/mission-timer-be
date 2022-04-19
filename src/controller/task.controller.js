@@ -55,30 +55,63 @@ const createTask = asyncHandler(async (req, res) => {
       participants = await new Participants({
         task: saveTask._id.toString(),
         user: req.user._id.toString(),
+        createdBy: req.user._id,
       })
+      await participants.save()
     }
     // if admin and Ministry create task
-    if (req.user.role.toString() === 'ADMIN' || req.user.role.toString() === 'MINISTRY')
-      return res.send({
-        code: 1,
-        msg: 'success',
-        message: 'Đã tạo task!',
-        data: {
-          task: saveTask,
-          participants,
-        },
-      })
+    if (
+      req.user.role.toString() === 'ADMIN' ||
+      req.user.role.toString() === 'MINISTRY'
+    ) {
+      participants = await Participants.insertMany([
+        listOfParticipants.map((item) => [
+          {
+            user: item.user,
+            task: saveTask._id.toString(),
+            createdBy: req.user._id,
+          },
+        ]),
+      ])
+      await participants.save()
+    }
+    return res.send({
+      code: 1,
+      msg: 'success',
+      message: 'Đã tạo task!',
+      data: {
+        task: saveTask,
+        participants,
+      },
+    })
   } catch (error) {
     return errorRespone(res, 400, 0, 'error', error)
   }
 })
 
-// @desc   Get avtivities of me
-// @route  Get /api/activity-detail/me
+// @desc   Get getTasksMe
+// @route  Get /api/task/me
 // @access Admin
 
-const getActivitiesDetailMe = asyncHandler(async (req, res) => {
+const getTasksMe = asyncHandler(async (req, res) => {
   try {
+    const listTasks = await Participants.find({ user: req.user._id })
+      .select('-user')
+      .populate({
+        path: 'task',
+        populate: {
+          path: 'activity',
+        },
+      })
+
+    return res.send({
+      code: 1,
+      msg: 'success',
+      message: `Danh sách task của ${req.user.name}`,
+      data: {
+        tasks: listTasks,
+      },
+    })
   } catch (error) {
     return errorRespone(res, 400, 0, 'error', error)
   }
@@ -95,4 +128,4 @@ const updateTaskMe = asyncHandler(async (req, res) => {
   }
 })
 
-export { createTask, getActivitiesDetailMe, updateTaskMe }
+export { createTask, getTasksMe, updateTaskMe }

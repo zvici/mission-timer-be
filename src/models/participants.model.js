@@ -20,7 +20,6 @@ const participantsSchema = mongoose.Schema(
     },
     confirmBy: {
       type: mongoose.Schema.Types.ObjectId,
-      required: true,
       ref: 'User',
     },
     image: {
