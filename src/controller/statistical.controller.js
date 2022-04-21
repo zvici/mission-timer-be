@@ -1,21 +1,23 @@
 import asyncHandler from 'express-async-handler'
-import Task from '../models/task.model.js'
+import Participants from '../models/participants.model.js'
 import User from '../models/user.model.js'
 import errorRespone from '../utils/errorRespone.js'
-import { countStatusActivity, sumQuota } from '../utils/statisticalFunction.js'
+import { sumQuota } from '../utils/statisticalFunction.js'
 const activityUsersStatistics = asyncHandler(async (req, res) => {
   try {
-    const result = await Task.find()
-      .select('quota status')
+    const result = await Participants.find()
       .populate({
-        path: 'activity',
-        select: 'content',
+        path: 'task',
+        select: 'officeHours activity',
         populate: {
-          path: 'year',
-          select: 'name',
+          path: 'activity',
+          select: 'year',
+          populate: {
+            path: 'year',
+            select: 'name',
+          },
         },
       })
-      .populate('assignee', 'name')
     const listUser = await User.find({ role: 'STAFF' }).select('name')
     let resultC = []
     if (result && listUser) {
@@ -23,12 +25,8 @@ const activityUsersStatistics = asyncHandler(async (req, res) => {
         resultC.push({
           id: item._id,
           name: item.name,
-          sumQuota: sumQuota(item.id, result),
-          notAnswered: countStatusActivity(item.id, result, 'notAnswered'),
-          refuse: countStatusActivity(item.id, result, 'refuse'),
-          attended: countStatusActivity(item.id, result, 'attended'),
-          accept: countStatusActivity(item.id, result, 'accept'),
-          notEngaged: countStatusActivity(item.id, result, 'notEngaged'),
+          userId: item.userId,
+          officeHours: sumQuota(item.id, result),
         })
       })
     }

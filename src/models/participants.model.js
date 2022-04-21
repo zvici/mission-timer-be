@@ -11,7 +11,7 @@ const participantsSchema = mongoose.Schema(
     status: {
       type: String,
       require: true,
-      enum: ['accept', 'refuse', 'notAnswered'],
+      enum: ['accept', 'refuse', 'done', 'incomplete', 'notAnswered'],
       default: 'notAnswered',
     },
     isApprove: {
