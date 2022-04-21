@@ -42,6 +42,9 @@ const userSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    updatePasswordAt: {
+      type: Date,
+    },
     phone: {
       type: String,
       default: '',

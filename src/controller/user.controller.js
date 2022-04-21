@@ -253,7 +253,7 @@ const updateAvatar = asyncHandler(async (req, res) => {
 
 // @desc   Forgot password
 // @route  POST /api/password/forgot-password
-// @access Protect
+// @access Public
 const forgotPassword = asyncHandler(async (req, res) => {
   try {
     const { userId } = req.body
@@ -271,7 +271,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
     //create OTP number
     const OTPStr = Math.floor(100000 + Math.random() * 900000).toString()
     //check otp exist
-    const otpExists = await Otps.findOne({ email: userExists.email })
+    const otpExists = await Otps.findOne({ user: userExists._id })
     //If it exists, update it else create it
     if (otpExists) {
       otpExists.otp = OTPStr
@@ -279,7 +279,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
       otpExists.save()
     } else {
       await Otps.create({
-        email: userExists.email,
+        user: userExists._id,
         otp: OTPStr,
         expirationTime: moment().add(15, 'minutes'),
       })
@@ -300,6 +300,47 @@ const forgotPassword = asyncHandler(async (req, res) => {
     return errorRespone(res, 400, 0, 'error', error)
   }
 })
+// @desc   Change password with Otp
+// @route  POST /api/password/check-otp
+// @access Public
+
+const checkOtp = asyncHandler(async (req, res) => {
+  try {
+    const { userId, otp } = req.body
+    //check if user not exists
+    const userExists = await User.findOne({ userId })
+    if (!userExists) {
+      return errorRespone(
+        res,
+        404,
+        0,
+        'error',
+        'Không tìm thấy người dùng này!'
+      )
+    }
+    const otpExists = await Otps.findOne({
+      user: userExists._id,
+      otp: otp,
+      expirationTime: { $gt: Date.now() },
+    })
+    if (!otpExists) {
+      return errorRespone(
+        res,
+        404,
+        0,
+        'error',
+        'OTP của bạn đã nhập không đúng hoặc đã hết hạn!'
+      )
+    }
+    res.status(200).json({
+      code: 1,
+      msg: 'success',
+      message: 'OTP chính xác!',
+    })
+  } catch (error) {
+    return errorRespone(res, 400, 0, 'error', error)
+  }
+})
 
 export {
   getUsers,
@@ -312,4 +353,5 @@ export {
   getProfileMe,
   updateAvatar,
   forgotPassword,
+  checkOtp,
 }
