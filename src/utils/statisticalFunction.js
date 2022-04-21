@@ -1,28 +1,41 @@
 const sumQuota = (id, listParticipants) => {
-  let sum = 0
+  let sumOfficeHours = 0
+  let countDone = 0
+  let notAnswered = 0
+  let sumTask = 0
+  let countAccepted = 0
+  let countRefuse = 0
+  let countIncomplete = 0
   listParticipants.map((item) => {
-    if (
-      item.user._id.toString() === id.toString() &&
-      item.isApprove &&
-      item.status === 'done'
-    ) {
-      sum += item.task.officeHours
-    }
-  }) 
-  return sum
-}
-
-const countStatusActivity = (id, listParticipants, status) => {
-  let count = 0
-  listParticipants.map((item) => {
-    if (
-      item.assignee._id.toString() === id.toString() &&
-      item.status === status
-    ) {
-      count += 1
+    if (item.user._id.toString() === id.toString()) {
+      sumTask += 1
+      if (item.isApprove && item.status === 'done') {
+        sumOfficeHours += item.task.officeHours
+        countDone += 1
+      }
+      if (item.status === 'notAnswered' && !item.isApprove) {
+        notAnswered += 1
+      }
+      if (item.status === 'accept' && !item.isApprove) {
+        countAccepted += 1
+      }
+      if (item.status === 'refuse') {
+        countRefuse += 1
+      }
+      if (item.status === 'incomplete' && !item.isApprove) {
+        countIncomplete += 1
+      }
     }
   })
-  return count
+  return {
+    sumTask,
+    sumOfficeHours,
+    countDone,
+    notAnswered,
+    countAccepted,
+    countRefuse,
+    countIncomplete,
+  }
 }
 
-export { sumQuota, countStatusActivity }
+export { sumQuota }

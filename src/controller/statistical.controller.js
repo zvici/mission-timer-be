@@ -5,19 +5,18 @@ import errorRespone from '../utils/errorRespone.js'
 import { sumQuota } from '../utils/statisticalFunction.js'
 const activityUsersStatistics = asyncHandler(async (req, res) => {
   try {
-    const result = await Participants.find()
-      .populate({
-        path: 'task',
-        select: 'officeHours activity',
+    const result = await Participants.find().populate({
+      path: 'task',
+      select: 'officeHours activity',
+      populate: {
+        path: 'activity',
+        select: 'year',
         populate: {
-          path: 'activity',
-          select: 'year',
-          populate: {
-            path: 'year',
-            select: 'name',
-          },
+          path: 'year',
+          select: 'name',
         },
-      })
+      },
+    })
     const listUser = await User.find({ role: 'STAFF' }).select('name')
     let resultC = []
     if (result && listUser) {
@@ -26,7 +25,7 @@ const activityUsersStatistics = asyncHandler(async (req, res) => {
           id: item._id,
           name: item.name,
           userId: item.userId,
-          officeHours: sumQuota(item.id, result),
+          ...sumQuota(item.id, result),
         })
       })
     }
