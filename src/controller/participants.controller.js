@@ -2,6 +2,7 @@ import asyncHandler from 'express-async-handler'
 import Comment from '../models/comment.model.js'
 import Participants from '../models/participants.model.js'
 import errorRespone from '../utils/errorRespone.js'
+import uploads from '../config/cloudinary.config.js'
 
 // @desc   delete a participant
 // @route  DELETE /api/participant/:id
@@ -76,4 +77,26 @@ const updateAnswerParticipants = asyncHandler(async (req, res) => {
   }
 })
 
-export { deleteAParticipant, updateAnswerParticipants }
+// @desc   push image evidence
+// @route  POST /api/participant/evidence/:id
+// @access STAFF
+
+const udpateEvidence = asyncHandler(async (req, res) => {
+  try {
+    const uploader = async (path) => await uploads(path, 'Evidences')
+    const newPath = await uploader(req.file.path)
+    const participant = await Participants.findById(req.params.id)
+    participant.image = newPath.url
+    await participant.save()
+    res.status(200).json({
+      code: 1,
+      msg: 'success',
+      message: 'Cập nhật hình thành công',
+      data: participant,
+    })
+  } catch (error) {
+    return errorRespone(res, 400, 0, 'error', error)
+  }
+})
+
+export { deleteAParticipant, updateAnswerParticipants, udpateEvidence }

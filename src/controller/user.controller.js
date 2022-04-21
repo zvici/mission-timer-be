@@ -4,6 +4,10 @@ import generateToken from '../utils/generateToken.js'
 import jwt from 'jsonwebtoken'
 import errorRespone from '../utils/errorRespone.js'
 import uploads from '../config/cloudinary.config.js'
+import sendMail from '../helpers/sendmail.js'
+import Otps from '../models/otp.model.js'
+import moment from 'moment'
+import { resHtmlForgotPassword } from '../helpers/html/resHtml.js'
 
 // @desc   Auth admin and get token
 // @route  POST /api/user/login
@@ -149,29 +153,10 @@ const createUser = asyncHandler(async (req, res) => {
 // @access Admin
 
 const updateUser = asyncHandler(async (req, res) => {
-  if (req.body) {
-    let user = await User.findById(req.params.id)
-    if (user) {
-      let updateUser = await user.save()
-      res.send({
-        code: 1,
-        msg: 'success',
-        message: 'Successfully update user',
-        data: updateUser,
-      })
-    } else {
-      return res.status(404).json({
-        code: 0,
-        msg: 'error',
-        message: 'Không tìm thấy user!',
-      })
-    }
-  } else {
-    return res.status(401).json({
-      code: 0,
-      msg: 'error',
-      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-    })
+  try {
+    const user = await User.findById(req.params.id)
+  } catch (error) {
+    return errorRespone(res, 400, 0, 'error', error)
   }
 })
 
@@ -245,10 +230,12 @@ const updateProfileUser = asyncHandler(async (req, res) => {
     return errorRespone(res, 400, 0, 'error', error)
   }
 })
-
+// @desc   Update avatar for user
+// @route  Put /api/user/avatar
+// @access protect
 const updateAvatar = asyncHandler(async (req, res) => {
   try {
-    const uploader = async (path) => await uploads(path, 'Images')
+    const uploader = async (path) => await uploads(path, 'Avatars')
     const newPath = await uploader(req.file.path)
     const user = await User.findById(req.user._id)
     user.avatar = newPath.url
@@ -258,6 +245,56 @@ const updateAvatar = asyncHandler(async (req, res) => {
       msg: 'success',
       message: 'Cập nhật hình thành công',
       data: newPath,
+    })
+  } catch (error) {
+    return errorRespone(res, 400, 0, 'error', error)
+  }
+})
+
+// @desc   Forgot password
+// @route  POST /api/password/forgot-password
+// @access Protect
+const forgotPassword = asyncHandler(async (req, res) => {
+  try {
+    const { userId } = req.body
+    //check if user not exists
+    const userExists = await User.findOne({ userId })
+    if (!userExists) {
+      return errorRespone(
+        res,
+        404,
+        0,
+        'error',
+        'Không tìm thấy người dùng này!'
+      )
+    }
+    //create OTP number
+    const OTPStr = Math.floor(100000 + Math.random() * 900000).toString()
+    //check otp exist
+    const otpExists = await Otps.findOne({ email: userExists.email })
+    //If it exists, update it else create it
+    if (otpExists) {
+      otpExists.otp = OTPStr
+      otpExists.expirationTime = moment().add(15, 'minutes')
+      otpExists.save()
+    } else {
+      await Otps.create({
+        email: userExists.email,
+        otp: OTPStr,
+        expirationTime: moment().add(15, 'minutes'),
+      })
+    }
+    // sendMail
+    await sendMail(
+      userExists.email,
+      'Xác minh đổi mật khẩu',
+      OTPStr,
+      resHtmlForgotPassword({ name: userExists.name, otp: OTPStr })
+    )
+    res.status(200).json({
+      code: 1,
+      msg: 'success',
+      message: 'Gửi mail thành công',
     })
   } catch (error) {
     return errorRespone(res, 400, 0, 'error', error)
@@ -274,4 +311,5 @@ export {
   updateProfileUser,
   getProfileMe,
   updateAvatar,
+  forgotPassword,
 }

@@ -1,26 +1,31 @@
-const nodemailer = require("nodemailer");
+import nodemailer from 'nodemailer'
 
-module.exports = function (mailto, subject, text) {
-  const transporter = nodemailer.createTransport({
-    service: "Gmail",
-    auth: {
-      user: "nhatranthanh115@gmail.com",
-      pass: "matkhaucc",
-    },
-  });
+const sendMail = (mailto, subject, text, html) => {
+  return new Promise((resolve, reject) => {
+    const transporter = nodemailer.createTransport({
+      service: 'Gmail',
+      auth: {
+        user: 'nhatranthanh115@gmail.com',
+        pass: 'matkhaucc',
+      },
+    })
 
-  const mainOptions = {
-    from: "Hệ thống quản lý công tác khác",
-    to: mailto,
-    subject,
-    text,
-  };
-
-  transporter.sendMail(mainOptions, function (err, info) {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log("Message sent: " + info.response);
+    const mainOptions = {
+      from: 'Hệ thống quản lý công tác khác',
+      to: mailto,
+      subject,
+      text,
+      html,
     }
-  });
-};
+
+    transporter.sendMail(mainOptions, function (err, info) {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(info)
+      }
+    })
+  })
+}
+
+export default sendMail

@@ -8,6 +8,7 @@ import {
   updateProfileUser,
   getProfileMe,
   updateAvatar,
+  forgotPassword,
 } from '../controller/user.controller.js'
 import { protect, admin } from '../middlewares/authMiddleware.js'
 import express from 'express'
@@ -22,6 +23,7 @@ router
   .put(protect, admin, updateUser)
 router.route('/me').get(protect, getProfileMe)
 router.route('/password').put(protect, updateUserPassword)
+router.route('/password/forgot-password').post(forgotPassword)
 router.route('/login').post(authAdmin)
 router.route('/staff/login').post(authStaff)
 router.route('/updateprofile').put(protect, updateProfileUser)
