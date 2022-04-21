@@ -47,15 +47,6 @@ const users = [
     address: 'TP HCM',
   },
   {
-    name: 'Vũ Phương Thảo',
-    userId: '00004',
-    password: bcrypt.hashSync('123456', 10),
-    role: 'STAFF',
-    email: 'phuongthao@gmail.com',
-    phone: '0334664242',
-    address: 'TP HCM',
-  },
-  {
     name: 'Huyền Trang',
     userId: '00005',
     password: bcrypt.hashSync('123456', 10),

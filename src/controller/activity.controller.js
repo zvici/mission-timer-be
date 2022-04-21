@@ -155,7 +155,7 @@ const deleteActivity = asyncHandler(async (req, res) => {
     if (!activityExistTask) {
       return errorRespone(res, 400, 0, 'error', 'Không được xóa hoạt dộng này')
     }
-    await activityExist.deleteOne({ _id: req.params.id })
+    await Activities.deleteOne({ _id: req.params.id })
     return res.json({
       code: 1,
       msg: 'success',
@@ -166,4 +166,10 @@ const deleteActivity = asyncHandler(async (req, res) => {
   }
 })
 
-export { createActivity, getActivities, updateActivity, deleteActivity, getActivitiesByYear }
+export {
+  createActivity,
+  getActivities,
+  updateActivity,
+  deleteActivity,
+  getActivitiesByYear,
+}
