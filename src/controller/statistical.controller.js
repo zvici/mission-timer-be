@@ -44,7 +44,7 @@ const activityUsersStatistics = asyncHandler(async (req, res) => {
 
 const activityAUserStatistics = asyncHandler(async (req, res) => {
   try {
-    const result = await Participants.find().populate({
+    const result = await Participants.find({}).populate({
       path: 'task',
       select: 'officeHours activity',
       populate: {
@@ -56,7 +56,8 @@ const activityAUserStatistics = asyncHandler(async (req, res) => {
         },
       },
     })
-    const listUser = await User.findById(req.params.id)
+
+    const listUser = await User.findById(req.params.user)
     if (!listUser) {
       return errorRespone(
         res,

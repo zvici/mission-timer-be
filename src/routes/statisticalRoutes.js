@@ -8,6 +8,6 @@ import express from 'express'
 const router = express.Router()
 
 router.route('/').get(activityUsersStatistics)
-router.route('/user/:id').get(activityAUserStatistics)
+router.route('/user/:user/year/:year').get(activityAUserStatistics)
 
 export default router
