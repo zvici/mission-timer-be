@@ -18,10 +18,10 @@ import activityRoutes from './routes/activityRoutes.js'
 import taskRoutes from './routes/taskRoutes.js'
 import statisticalRoutes from './routes/statisticalRoutes.js'
 import contentRoutes from './routes/contentRoutes.js'
+import semesterRoutes from './routes/semesterRouter.js'
 
 dotenv.config()
 connectDB()
-
 
 // middlewares
 const app = express()
@@ -40,7 +40,7 @@ app.use(
 // Use router
 
 app.use('/api/user', userRoutes)
-// app.use('/api/department', routes.department)
+app.use('/api/semester', semesterRoutes)
 app.use('/api/year', yearRoutes)
 app.use('/api/content', contentRoutes)
 app.use('/api/statistical', statisticalRoutes)
