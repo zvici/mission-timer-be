@@ -39,7 +39,7 @@ const deleteAParticipant = asyncHandler(async (req, res) => {
 
 const updateAnswerParticipants = asyncHandler(async (req, res) => {
   try {
-    const { status, content } = req.body
+    const { status, content, imageBase64 } = req.body
     // check id participants exist
     const isParticipantExist = await Participants.findById(req.params.id)
     if (!isParticipantExist) {
@@ -66,6 +66,9 @@ const updateAnswerParticipants = asyncHandler(async (req, res) => {
     }
     // update participant
     isParticipantExist.status = status
+    if (status === 'done') {
+      isParticipantExist.imageBase64 = imageBase64
+    }
     await isParticipantExist.save()
     return res.send({
       code: 1,
