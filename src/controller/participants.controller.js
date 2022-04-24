@@ -57,8 +57,8 @@ const updateAnswerParticipants = asyncHandler(async (req, res) => {
     }
     // If you refuse, there must be a reason
     if (status === 'refuse') {
-      const newComent = await new Comment.save({
-        participant: isParticipantExist.toString(),
+      const newComent = await new Comment({
+        participants: isParticipantExist._id.toString(),
         user: req.user._id,
         content,
       })
