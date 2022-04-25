@@ -19,11 +19,6 @@ const activitySchema = mongoose.Schema(
       required: true,
       ref: 'Content',
     },
-    year: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      ref: 'Year',
-    },
     type: {
       type: String,
       enum: ['STAFF', 'MINISTRY', 'MONITOR_EXAM'],

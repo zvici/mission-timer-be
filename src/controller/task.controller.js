@@ -1,6 +1,7 @@
 import asyncHandler from 'express-async-handler'
 import Activities from '../models/activity.model.js'
 import Participants from '../models/participants.model.js'
+import Semester from '../models/semester.model.js'
 import Task from '../models/task.model.js'
 import errorRespone from '../utils/errorRespone.js'
 
@@ -17,6 +18,7 @@ const createTask = asyncHandler(async (req, res) => {
       endDate,
       officeHours,
       listOfParticipants,
+      semester,
     } = req.body
     //Check activity exist
     const activityExist = await Activities.findById(activity)
@@ -35,10 +37,16 @@ const createTask = asyncHandler(async (req, res) => {
         'Bạn không có quyền tạo task với hoạt động này!'
       )
     }
+    // Check semester exist
+    const semesterExist = await Semester.findById(semester)
+    if (!semesterExist) {
+      return errorRespone(res, 404, 0, 'error', 'Không tìm thấy học kỳ này!')
+    }
     // Create Activity Detail
     const newTask = await new Task({
       activity,
       description,
+      semester,
       startDate,
       endDate,
       officeHours,
@@ -64,16 +72,15 @@ const createTask = asyncHandler(async (req, res) => {
       req.user.role.toString() === 'ADMIN' ||
       req.user.role.toString() === 'MINISTRY'
     ) {
-      participants = await Participants.insertMany([
+      await Participants.insertMany(
         listOfParticipants.map((item) => [
           {
             user: item.user,
             task: saveTask._id.toString(),
-            createdBy: req.user._id,
+            createdBy: req.user._id.toString(),
           },
-        ]),
-      ])
-      await participants.save()
+        ])
+      )
     }
     return res.send({
       code: 1,
@@ -117,13 +124,35 @@ const getTasksMe = asyncHandler(async (req, res) => {
   }
 })
 
+// @desc   Get getTasks
+// @route  Get /api/task
+// @access Admin
+
+const getTasks = asyncHandler(async (req, res) => {
+  try {
+    const listTasks = await Task.find()
+
+    return res.send({
+      code: 1,
+      msg: 'success',
+      message: `Danh sách task`,
+      data: {
+        tasks: listTasks,
+      },
+    })
+  } catch (error) {
+    return errorRespone(res, 400, 0, 'error', error)
+  }
+})
+
 // @desc   Update Task
 // @route  Put /api/task/:id
 // @access MINISTRY, STAFF
 
 const updateTask = asyncHandler(async (req, res) => {
   try {
-    const { activity, description, startDate, endDate, officeHours } = req.body
+    const { activity, description, semester, startDate, endDate, officeHours } =
+      req.body
     //Check task exist
     const taskExist = await Task.findById(req.params.id)
     if (!taskExist) {
@@ -154,6 +183,7 @@ const updateTask = asyncHandler(async (req, res) => {
 
     taskExist.activity = activity
     taskExist.description = description
+    taskExist.semester = semester
     taskExist.startDate = startDate
     taskExist.endDate = endDate
     taskExist.officeHours = officeHours
@@ -173,4 +203,4 @@ const updateTask = asyncHandler(async (req, res) => {
   }
 })
 
-export { createTask, getTasksMe, updateTask }
+export { createTask, getTasksMe, updateTask, getTasks }

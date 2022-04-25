@@ -26,6 +26,10 @@ const participantsSchema = mongoose.Schema(
       type: String,
       default: '',
     },
+    imageBase64: {
+      type: String,
+      default: '',
+    },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',

@@ -11,6 +11,11 @@ const taskSchema = mongoose.Schema(
       type: String,
       default: '',
     },
+    semester: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: 'Semester',
+    },
     startDate: {
       type: Date,
     },

@@ -10,12 +10,7 @@ import Task from '../models/task.model.js'
 // @access Admin
 const createActivity = asyncHandler(async (req, res) => {
   try {
-    const { title, description, quota, year, content, type } = req.body
-    //Check year exist
-    const yearExist = await Year.findById(year)
-    if (!yearExist) {
-      return errorRespone(res, 404, 0, 'error', 'Năm học không tồn tại')
-    }
+    const { title, description, quota, content, type } = req.body
     //Check content exist
     const contentExist = await Content.findById(content)
     if (!contentExist) {
@@ -26,7 +21,6 @@ const createActivity = asyncHandler(async (req, res) => {
       description,
       quota,
       content,
-      year,
       type,
       createdBy: req.user._id,
     })
@@ -50,32 +44,12 @@ const createActivity = asyncHandler(async (req, res) => {
 
 const getActivities = asyncHandler(async (req, res) => {
   try {
-    const activities = await Activities.find({})
-      .populate('year', 'name')
-      .populate('content', 'title')
-      .populate('createdBy', 'name')
-      .populate('updatedBy', 'name')
-    return res.send({
-      code: 1,
-      msg: 'success',
-      message: 'Danh sách hoạt động công tác khác',
-      data: {
-        activities,
-      },
-    })
-  } catch (error) {
-    return errorRespone(res, 400, 0, 'error', error)
-  }
-})
-
-// @desc   Get list activity by year
-// @route  Get /api/activity/year/:year
-// @access Admin
-
-const getActivitiesByYear = asyncHandler(async (req, res) => {
-  try {
-    const activities = await Activities.find({ year: req.params.year })
-      .populate('year', 'name')
+    const content = req.query.content
+      ? {
+          content: req.query.content,
+        }
+      : {}
+    const activities = await Activities.find(content)
       .populate('content', 'title')
       .populate('createdBy', 'name')
       .populate('updatedBy', 'name')
@@ -97,18 +71,13 @@ const getActivitiesByYear = asyncHandler(async (req, res) => {
 // @access Admin
 
 const updateActivity = asyncHandler(async (req, res) => {
-  const { title, description, quota, content, year, type } = req.body
+  const { title, description, quota, content, type } = req.body
 
   try {
     //Check activity exist
     const activityExist = await Activities.findById(req.params.id)
     if (!activityExist) {
       return errorRespone(res, 404, 0, 'error', 'Hoạt động không tồn tại')
-    }
-    //Check year exist
-    const yearExist = await Year.findById(year)
-    if (!yearExist) {
-      return errorRespone(res, 404, 0, 'error', 'Năm học không tồn tại')
     }
     //Check content exist
     const contentExist = await Content.findById(content)
@@ -121,7 +90,6 @@ const updateActivity = asyncHandler(async (req, res) => {
     activityExist.description = description
     activityExist.quota = quota
     activityExist.content = content
-    activityExist.year = year
     activityExist.type = type
     activityExist.updatedBy = req.user._id
 
@@ -166,10 +134,4 @@ const deleteActivity = asyncHandler(async (req, res) => {
   }
 })
 
-export {
-  createActivity,
-  getActivities,
-  updateActivity,
-  deleteActivity,
-  getActivitiesByYear,
-}
+export { createActivity, getActivities, updateActivity, deleteActivity }
