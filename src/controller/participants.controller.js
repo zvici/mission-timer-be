@@ -80,7 +80,6 @@ const updateAnswerParticipants = asyncHandler(async (req, res) => {
 // @desc   push image evidence
 // @route  POST /api/participant/evidence/:id
 // @access STAFF
-
 const udpateEvidence = asyncHandler(async (req, res) => {
   try {
     const uploader = async (path) => await uploads(path, 'Evidences')

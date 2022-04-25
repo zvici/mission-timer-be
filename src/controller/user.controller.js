@@ -122,29 +122,40 @@ const getUsers = asyncHandler(async (req, res) => {
 // @route  Post /api/users/
 // @access Admin
 const createUser = asyncHandler(async (req, res) => {
-  const { userId } = req.body
-  const isUserExist = users.findOne({ userId })
-  if (isUserExist) {
-    return res.status(400).json({
-      code: 0,
-      msg: 'error',
-      message: 'User đã tồn tại!',
+  try {
+    const {
+      name,
+      userId,
+      password,
+      department,
+      subject,
+      role,
+      email,
+      phone,
+      address,
+    } = req.body
+    const newUser = await new User({
+      name,
+      userId,
+      password,
+      department,
+      subject,
+      role,
+      email,
+      phone,
+      address,
     })
-  }
-  const user = await User.save(req.body)
-  if (user) {
-    res.send({
+    const user = await newUser.save(req.body)
+    return res.send({
       code: 1,
       msg: 'success',
       message: 'Tạo user thành công!',
-      data: user,
+      data: {
+        user,
+      },
     })
-  } else {
-    return res.status(401).json({
-      code: 0,
-      msg: 'error',
-      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-    })
+  } catch (error) {
+    return errorRespone(res, 401, 0, 'error', error)
   }
 })
 

@@ -9,7 +9,14 @@ const userSchema = mongoose.Schema(
     },
     userId: {
       type: String,
-      required: true,
+      validate: {
+        validator: function (v) {
+          var re = /\b\d{5}\b/
+          return re.test(v)
+        },
+        message: 'is invalid.',
+      },
+      unique: true,
     },
     password: {
       type: String,
@@ -32,6 +39,7 @@ const userSchema = mongoose.Schema(
     email: {
       type: String,
       required: true,
+      unique: true,
     },
     isActive: {
       type: Boolean,
@@ -48,6 +56,7 @@ const userSchema = mongoose.Schema(
     phone: {
       type: String,
       default: '',
+      unique: true,
     },
     address: {
       type: String,

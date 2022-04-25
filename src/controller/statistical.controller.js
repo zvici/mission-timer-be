@@ -79,6 +79,7 @@ const activityAUserStatistics = asyncHandler(async (req, res) => {
       message: 'Thông kê trạng thái hoạt động của giảng viên.',
       data: {
         statistic: resultC,
+        result,
       },
     })
   } catch (error) {
