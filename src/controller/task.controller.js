@@ -4,7 +4,7 @@ import Participants from '../models/participants.model.js'
 import Semester from '../models/semester.model.js'
 import Task from '../models/task.model.js'
 import errorRespone from '../utils/errorRespone.js'
-
+import https from 'https'
 // @desc   Create one Task
 // @route  POST /api/activity-detail
 // @access Admin
@@ -130,6 +130,43 @@ const getTasksMe = asyncHandler(async (req, res) => {
 
 const getTasks = asyncHandler(async (req, res) => {
   try {
+    var sendNotification = function (data) {
+      var headers = {
+        'Content-Type': 'application/json; charset=utf-8',
+        Authorization: 'Basic MzZhOTBkMzEtM2ZlNy00YzA3LWE1NzgtMWM4MTEyMzE5NmZl',
+      }
+
+      var options = {
+        host: 'onesignal.com',
+        port: 443,
+        path: '/api/v1/notifications',
+        method: 'POST',
+        headers: headers,
+      }
+      var req = https.request(options, function (res) {
+        res.on('data', function (data) {
+          console.log('Response:')
+          console.log(JSON.parse(data))
+        })
+      })
+
+      req.on('error', function (e) {
+        console.log('ERROR:')
+        console.log(e)
+      })
+
+      req.write(JSON.stringify(data))
+      req.end()
+    }
+
+    var message = {
+      app_id: '22906000-58fe-4443-8f57-0ffd53bd63cf',
+      contents: { en: 'English Message' },
+      channel_for_external_user_ids: 'push',
+      include_external_user_ids: ['da0b04b0-54a4-470c-8556-3b1f672b5b22'],
+    }
+
+    sendNotification(message)
     const listTasks = await Task.find()
 
     return res.send({
