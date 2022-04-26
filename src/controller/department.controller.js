@@ -67,6 +67,7 @@ const updateDepartment = asyncHandler(async (req, res) => {
     isDepartmentExist.phone = phone
     isDepartmentExist.address = address
     isDepartmentExist.description = description
+    isDepartmentExist.updatedBy = req.user._id
 
     const updateDepartment = await isDepartmentExist.save()
     res.send({
