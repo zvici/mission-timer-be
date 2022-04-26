@@ -12,6 +12,7 @@ const swaggerDocument = JSON.parse(
   await readFile(new URL('./config/swagger.json', import.meta.url))
 )
 
+import departmentRoutes from './routes/departmentRoutes.js'
 import userRoutes from './routes/userRoutes.js'
 import yearRoutes from './routes/yearRoutes.js'
 import activityRoutes from './routes/activityRoutes.js'
@@ -40,6 +41,7 @@ app.use(
 
 // Use router
 
+app.use('/api/department', departmentRoutes)
 app.use('/api/user', userRoutes)
 app.use('/api/semester', semesterRoutes)
 app.use('/api/year', yearRoutes)
