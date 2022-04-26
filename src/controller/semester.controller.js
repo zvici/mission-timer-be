@@ -21,6 +21,7 @@ const createSemester = asyncHandler(async (req, res) => {
       startDate,
       endDate,
       description,
+      createdBy: req.user._id,
     })
     const newSemester = await semester.save()
     res.send({
@@ -68,6 +69,8 @@ const getSemesters = asyncHandler(async (req, res) => {
         }
       : {}
     const semesters = await Semester.find(yearQuery)
+      .populate('createdBy', 'name')
+      .populate('updatedBy', 'name')
     res.send({
       code: 1,
       msg: 'success',
@@ -96,7 +99,7 @@ const updateSemester = asyncHandler(async (req, res) => {
     // check semester exist
     const yearExist = await Year.findById(year)
     if (!yearExist) {
-      return errorRespone(res, 404, 1, 'error', 'Không tìm thấy học kỳ này!')
+      return errorRespone(res, 404, 1, 'error', 'Không tìm thấy năm học này!')
     }
     //
     semesterExist.startDate = startDate
@@ -104,11 +107,12 @@ const updateSemester = asyncHandler(async (req, res) => {
     semesterExist.description = description
     semesterExist.name = name
     semesterExist.year = year
+    semesterExist.updatedBy = req.user._id
     const upadateSemester = await semesterExist.save()
     return res.send({
       code: 1,
       msg: 'success',
-      message: 'Cập nhật năm học thành công!',
+      message: 'Cập nhật học kỳ thành công!',
       data: {
         semester: upadateSemester,
       },

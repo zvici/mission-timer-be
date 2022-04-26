@@ -16,7 +16,18 @@ const semesterSchema = mongoose.Schema(
       required: true,
       ref: 'Year',
     },
-    description: String,
+    description: {
+      type: String,
+      default: '',
+    },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
+    updatedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
   },
   { timestamps: true }
 )
