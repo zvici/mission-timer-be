@@ -56,6 +56,14 @@ app.use('/api/subject', subjectRoutes)
 app.get('/', (req, res) => {
   res.send({
     message: 'Welcome to Api Mission timer',
+    time: new Date()
+  })
+})
+
+app.get('/api', (req, res) => {
+  res.send({
+    message: 'Welcome to Api Mission timer',
+    time: new Date()
   })
 })
 
