@@ -311,7 +311,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
     return errorRespone(res, 400, 0, 'error', error)
   }
 })
-// @desc   Change password with Otp
+// @desc   check Otp
 // @route  POST /api/password/check-otp
 // @access Public
 
@@ -353,6 +353,51 @@ const checkOtp = asyncHandler(async (req, res) => {
   }
 })
 
+// @desc   Change password with Otp
+// @route  POST /api/password/change-pass-otp
+// @access Public
+const changePassWithOTP = asyncHandler(async (req, res) => {
+  try {
+    const { userId, otp, newPassword } = req.body
+    //check if user not exists
+    const userExists = await User.findOne({ userId })
+    if (!userExists) {
+      return errorRespone(
+        res,
+        404,
+        0,
+        'error',
+        'Không tìm thấy người dùng này!'
+      )
+    }
+    const otpExists = await Otps.findOne({
+      user: userExists._id,
+      otp: otp,
+      expirationTime: { $gt: Date.now() },
+    })
+    if (!otpExists) {
+      return errorRespone(
+        res,
+        404,
+        0,
+        'error',
+        'OTP của bạn đã nhập không đúng hoặc đã hết hạn!'
+      )
+    }
+    await otpExists.delete()
+    userExists.password = newPassword
+    userExists.isPasswordChanged = true
+    await userExists.save()
+    return res.status(200).json({
+      code: 1,
+      msg: 'success',
+      message: 'Cập nhật mật khẩu thành công!',
+    })
+  } catch (error) {
+    return errorRespone(res, 400, 0, 'error', error)
+  }
+})
+
 export {
   getUsers,
   authAdmin,
@@ -365,4 +410,5 @@ export {
   updateAvatar,
   forgotPassword,
   checkOtp,
+  changePassWithOTP,
 }
