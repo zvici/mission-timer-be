@@ -21,6 +21,7 @@ import statisticalRoutes from './routes/statisticalRoutes.js'
 import contentRoutes from './routes/contentRoutes.js'
 import semesterRoutes from './routes/semesterRouter.js'
 import participantRoutes from './routes/participantRoutes.js'
+import subjectRoutes from './routes/subjectRoutes.js'
 
 dotenv.config()
 connectDB()
@@ -50,6 +51,7 @@ app.use('/api/statistical', statisticalRoutes)
 app.use('/api/activity', activityRoutes)
 app.use('/api/task', taskRoutes)
 app.use('/api/participant', participantRoutes)
+app.use('/api/subject', subjectRoutes)
 
 app.get('/', (req, res) => {
   res.send({
