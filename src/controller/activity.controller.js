@@ -4,6 +4,7 @@ import Year from '../models/year.model.js'
 import errorRespone from '../utils/errorRespone.js'
 import Content from '../models/content.model.js'
 import Task from '../models/task.model.js'
+import removeEmpty from '../utils/removeEmpty.js'
 
 // @desc   Create one Activity
 // @route  POST /api/activity
@@ -44,12 +45,9 @@ const createActivity = asyncHandler(async (req, res) => {
 
 const getActivities = asyncHandler(async (req, res) => {
   try {
-    const content = req.query.content
-      ? {
-          content: req.query.content,
-        }
-      : {}
-    const activities = await Activities.find(content)
+    const { content, type } = req.query
+    const queryFind = { content, type }
+    const activities = await Activities.find(removeEmpty(queryFind))
       .populate('content', 'title')
       .populate('createdBy', 'name')
       .populate('updatedBy', 'name')
