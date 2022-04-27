@@ -69,6 +69,7 @@ const getSemesters = asyncHandler(async (req, res) => {
         }
       : {}
     const semesters = await Semester.find(yearQuery)
+      .populate('year', 'name')
       .populate('createdBy', 'name')
       .populate('updatedBy', 'name')
     res.send({

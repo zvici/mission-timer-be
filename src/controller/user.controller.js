@@ -98,23 +98,20 @@ const authStaff = asyncHandler(async (req, res) => {
 // @route  Get /api/user/
 // @access Admin
 const getUsers = asyncHandler(async (req, res) => {
-  const users = await User.find().sort({
-    createdAt: -1,
-  })
-
-  if (users) {
+  try {
+    const users = await User.find()
+      .sort({
+        createdAt: -1,
+      })
+      .select('-password')
     res.send({
       code: 1,
       msg: 'success',
       message: 'List all user',
       data: users,
     })
-  } else {
-    return res.status(401).json({
-      code: 0,
-      msg: 'error',
-      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-    })
+  } catch (err) {
+    return errorRespone(res, 400, 0, 'error', error)
   }
 })
 
@@ -165,7 +162,16 @@ const createUser = asyncHandler(async (req, res) => {
 
 const updateUser = asyncHandler(async (req, res) => {
   try {
-    const user = await User.findById(req.params.id)
+    const userExists = await User.findById(req.params.id)
+    if (!userExists) {
+      return errorRespone(
+        res,
+        404,
+        0,
+        'error',
+        'Không tìm thấy người dùng này!'
+      )
+    }
   } catch (error) {
     return errorRespone(res, 400, 0, 'error', error)
   }
@@ -352,7 +358,6 @@ const checkOtp = asyncHandler(async (req, res) => {
     return errorRespone(res, 400, 0, 'error', error)
   }
 })
-
 // @desc   Change password with Otp
 // @route  POST /api/password/change-pass-otp
 // @access Public
