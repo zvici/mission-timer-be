@@ -1,5 +1,6 @@
 import asyncHandler from 'express-async-handler'
 import Participants from '../models/participants.model.js'
+import Semester from '../models/semester.model.js'
 import User from '../models/user.model.js'
 import errorRespone from '../utils/errorRespone.js'
 import { sumQuota } from '../utils/statisticalFunction.js'
@@ -44,21 +45,10 @@ const activityUsersStatistics = asyncHandler(async (req, res) => {
 
 const activityAUserStatistics = asyncHandler(async (req, res) => {
   try {
-    const result = await Participants.find({}).populate({
-      path: 'task',
-      select: 'officeHours activity',
-      populate: {
-        path: 'activity',
-        select: 'year',
-        populate: {
-          path: 'year',
-          select: 'name',
-        },
-      },
-    })
-
-    const listUser = await User.findById(req.params.user)
-    if (!listUser) {
+    const { user } = req.params
+    const { semester } = req.query
+    const userExist = await User.findById(user)
+    if (!userExist) {
       return errorRespone(
         res,
         404,
@@ -67,19 +57,35 @@ const activityAUserStatistics = asyncHandler(async (req, res) => {
         'Không tìm thấy người dùng này!'
       )
     }
-    let resultC = {
-      id: listUser._id,
-      name: listUser.name,
-      userId: listUser.userId,
-      ...sumQuota(listUser.id, result),
+    const semesterExist = await Semester.findById(semester)
+    if (!semesterExist) {
+      return errorRespone(res, 404, 0, 'error', 'Không tìm thấy học kỳ này!')
     }
+    const result = await Participants.find({}).populate({
+      path: 'task',
+      select: 'officeHours semester',
+    })
+
+    let newResult = [...result]
+    if (result.length > 0 && semester) {
+      newResult = newResult.filter(
+        (task) => task.task.semester.toString() === semester
+      )
+    }
+    let resultC = []
+    resultC.push({
+      id: userExist._id,
+      name: userExist.name,
+      userId: userExist.userId,
+      ...sumQuota(userExist.id, newResult),
+    })
+
     return res.send({
       code: 1,
       msg: 'success',
-      message: 'Thông kê trạng thái hoạt động của giảng viên.',
+      message: `Thông kê trạng thái hoạt động của giảng viên trong ${semesterExist.name}`,
       data: {
         statistic: resultC,
-        result,
       },
     })
   } catch (error) {
