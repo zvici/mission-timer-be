@@ -4,6 +4,8 @@ import Participants from '../models/participants.model.js'
 import Semester from '../models/semester.model.js'
 import Task from '../models/task.model.js'
 import errorRespone from '../utils/errorRespone.js'
+import removeEmpty from '../utils/removeEmpty.js'
+
 // @desc   Create one Task
 // @route  POST /api/activity-detail
 // @access Admin
@@ -74,7 +76,7 @@ const createTask = asyncHandler(async (req, res) => {
       await Participants.insertMany(
         listOfParticipants.map((item) => [
           {
-            user: item.user,
+            user: item.user.toString(),
             task: saveTask._id.toString(),
             createdBy: req.user._id.toString(),
           },
@@ -101,7 +103,12 @@ const createTask = asyncHandler(async (req, res) => {
 
 const getTasksMe = asyncHandler(async (req, res) => {
   try {
-    const listTasks = await Participants.find({ user: req.user._id })
+    const { status, semester } = req.query
+    const queryFind = { status }
+    const listTasks = await Participants.find({
+      user: req.user._id,
+      ...removeEmpty(queryFind),
+    })
       .select('-user')
       .populate({
         path: 'task',
@@ -109,13 +116,18 @@ const getTasksMe = asyncHandler(async (req, res) => {
           path: 'activity',
         },
       })
-
+    let newListasks = [...listTasks]
+    if (listTasks.length > 0 && semester) {
+      newListasks = listTasks.filter(
+        (task) => task.task.semester.toString() === semester
+      )
+    }
     return res.send({
       code: 1,
       msg: 'success',
       message: `Danh sách task của ${req.user.name}`,
       data: {
-        tasks: listTasks,
+        tasks: newListasks,
       },
     })
   } catch (error) {
