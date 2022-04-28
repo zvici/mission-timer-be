@@ -140,8 +140,7 @@ const getTasksMe = asyncHandler(async (req, res) => {
 
 const getTasks = asyncHandler(async (req, res) => {
   try {
-    const listTasks = await Task.find()
-
+    const listTasks = await Task.find().populate('activity', 'type')
     return res.send({
       code: 1,
       msg: 'success',
