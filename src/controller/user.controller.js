@@ -8,6 +8,7 @@ import sendMail from '../helpers/sendmail.js'
 import Otps from '../models/otp.model.js'
 import moment from 'moment'
 import { resHtmlForgotPassword } from '../helpers/html/resHtml.js'
+import removeEmpty from '../utils/removeEmpty.js'
 
 // @desc   Auth admin and get token
 // @route  POST /api/user/login
@@ -99,7 +100,9 @@ const authStaff = asyncHandler(async (req, res) => {
 // @access Admin
 const getUsers = asyncHandler(async (req, res) => {
   try {
-    const users = await User.find()
+    const { role } = req.query
+    const queryFind = { role }
+    const users = await User.find(removeEmpty(queryFind))
       .sort({
         createdAt: -1,
       })
@@ -107,8 +110,8 @@ const getUsers = asyncHandler(async (req, res) => {
     res.send({
       code: 1,
       msg: 'success',
-      message: 'List all user',
-      data: users,
+      message: 'Danh sách người dùng',
+      data: { users },
     })
   } catch (err) {
     return errorRespone(res, 400, 0, 'error', error)

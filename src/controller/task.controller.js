@@ -50,7 +50,7 @@ const createTask = asyncHandler(async (req, res) => {
       semester,
       startDate,
       endDate,
-      officeHours,
+      officeHours: parseInt(officeHours),
       createdBy: req.user._id,
     })
     const saveTask = await newTask.save()
@@ -73,14 +73,12 @@ const createTask = asyncHandler(async (req, res) => {
       req.user.role.toString() === 'ADMIN' ||
       req.user.role.toString() === 'MINISTRY'
     ) {
-      await Participants.insertMany(
-        listOfParticipants.map((item) => [
-          {
-            user: item.user.toString(),
-            task: saveTask._id.toString(),
-            createdBy: req.user._id.toString(),
-          },
-        ])
+      participants = await Participants.insertMany(
+        listOfParticipants.map((item) => ({
+          user: item.toString(),
+          task: saveTask._id.toString(),
+          createdBy: req.user._id.toString(),
+        }))
       )
     }
     return res.send({
@@ -122,7 +120,7 @@ const getTasksMe = asyncHandler(async (req, res) => {
         (task) => task.task.semester.toString() === semester
       )
     }
-    
+
     return res.send({
       code: 1,
       msg: 'success',

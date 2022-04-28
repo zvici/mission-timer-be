@@ -3,6 +3,36 @@ import Comment from '../models/comment.model.js'
 import Participants from '../models/participants.model.js'
 import errorRespone from '../utils/errorRespone.js'
 import uploads from '../config/cloudinary.config.js'
+import removeEmpty from '../utils/removeEmpty.js'
+import User from '../models/user.model.js'
+import Task from '../models/task.model.js'
+
+// @desc   get a participant
+// @route  GET /api/participant
+// @access ADMIN
+
+const getParticipants = asyncHandler(async (req, res) => {
+  try {
+    const { task } = req.query
+    const queryFind = { task }
+    // get list participants by task
+    const participants = await Participants.find(removeEmpty(queryFind))
+      .populate('user', 'name userId')
+      .populate('task')
+      .populate('createdBy', 'name')
+      .populate('updatedBy', 'name')
+    return res.json({
+      code: 1,
+      msg: 'success',
+      message: 'Danh sách người tham gia',
+      data: {
+        participants,
+      },
+    })
+  } catch (err) {
+    return errorRespone(res, 400, 0, 'error', err)
+  }
+})
 
 // @desc   delete a participant
 // @route  DELETE /api/participant/:id
@@ -101,4 +131,91 @@ const udpateEvidence = asyncHandler(async (req, res) => {
   }
 })
 
-export { deleteAParticipant, updateAnswerParticipants, udpateEvidence }
+// @desc   app
+// @route  PUT /api/participant/approve/:id
+// @access STAFF
+const updateApprove = asyncHandler(async (req, res) => {
+  try {
+    const isParticipantExist = await Participants.findById(req.params.id)
+    if (!isParticipantExist) {
+      return errorRespone(
+        res,
+        404,
+        0,
+        'error',
+        'Không tìm thấy người tham gia này!'
+      )
+    }
+    isParticipantExist.isApprove = !isParticipantExist.isApprove
+    isParticipantExist.updatedBy = req.user._id
+    await isParticipantExist.save()
+    res.status(200).json({
+      code: 1,
+      msg: 'success',
+      message: 'Đã cập nhật',
+    })
+  } catch (error) {
+    return errorRespone(res, 400, 0, 'error', error)
+  }
+})
+
+// @desc   app
+// @route  POST /api/participant/approve/:id
+// @access STAFF
+const createParticipant = asyncHandler(async (req, res) => {
+  try {
+    const { task, user } = req.body
+    // Check task exist
+    const isTaskExist = await Task.findById(task)
+    if (!isTaskExist) {
+      return errorRespone(res, 404, 0, 'error', 'Không tìm công việc này!')
+    }
+    // Check user exist
+    const isUserExist = await User.findById(user)
+    if (!isUserExist) {
+      return errorRespone(
+        res,
+        404,
+        0,
+        'error',
+        'Không tìm thấy người dùng này!'
+      )
+    }
+
+    const isParticipantExist = await Participants.findOne({
+      user: user,
+      task: task,
+    })
+    if (isParticipantExist) {
+      return errorRespone(
+        res,
+        404,
+        0,
+        'error',
+        'Người này đã có trong công việc này!'
+      )
+    }
+    const newParticiant = new Participants({
+      user: user,
+      task: task,
+      createdBy: req.user._id,
+    })
+    await newParticiant.save()
+    res.status(200).json({
+      code: 1,
+      msg: 'success',
+      message: 'Đã thêm người dùng vào công việc',
+    })
+  } catch (error) {
+    return errorRespone(res, 400, 0, 'error', error)
+  }
+})
+
+export {
+  deleteAParticipant,
+  updateAnswerParticipants,
+  udpateEvidence,
+  getParticipants,
+  updateApprove,
+  createParticipant,
+}
