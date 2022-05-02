@@ -9,21 +9,27 @@ const sumQuota = (id, listParticipants) => {
   listParticipants.map((item) => {
     if (item.user._id.toString() === id.toString()) {
       sumTask += 1
-      if (item.isApprove && item.status === 'done') {
+      if (item.task.activity.type === 'MINISTRY' && item.isApprove) {
+        if (item.status === 'done') {
+          sumOfficeHours += item.task.officeHours
+          countDone += 1
+        }
+        if (item.status === 'incomplete') {
+          countIncomplete += 1
+        }
+      }
+      if (item.task.activity.type === 'STAFF' && item.imageBase64) {
+        if (item.status === 'incomplete') {
+          countIncomplete += 1
+        }
+        if (item.status === 'done') {
+          sumOfficeHours += item.task.officeHours
+          countDone += 1
+        }
+      }
+      if (item.status === 'done') {
         sumOfficeHours += item.task.officeHours
         countDone += 1
-      }
-      if (item.status === 'notAnswered' && !item.isApprove) {
-        notAnswered += 1
-      }
-      if (item.status === 'accept' && !item.isApprove) {
-        countAccepted += 1
-      }
-      if (item.status === 'refuse') {
-        countRefuse += 1
-      }
-      if (item.status === 'incomplete' && !item.isApprove) {
-        countIncomplete += 1
       }
     }
   })

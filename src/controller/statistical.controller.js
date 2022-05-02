@@ -61,9 +61,13 @@ const activityAUserStatistics = asyncHandler(async (req, res) => {
     if (!semesterExist) {
       return errorRespone(res, 404, 0, 'error', 'Không tìm thấy học kỳ này!')
     }
-    const result = await Participants.find({}).populate({
+    const result = await Participants.find({ user: user }).populate({
       path: 'task',
       select: 'officeHours semester',
+      populate: {
+        path: 'activity',
+        select: 'type',
+      },
     })
 
     let newResult = [...result]
@@ -73,6 +77,7 @@ const activityAUserStatistics = asyncHandler(async (req, res) => {
       )
     }
     let resultC = []
+    console.log(newResult)
     resultC.push({
       id: userExist._id,
       name: userExist.name,
