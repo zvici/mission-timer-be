@@ -27,10 +27,6 @@ const sumQuota = (id, listParticipants) => {
           countDone += 1
         }
       }
-      if (item.status === 'done') {
-        sumOfficeHours += item.task.officeHours
-        countDone += 1
-      }
     }
   })
   return {

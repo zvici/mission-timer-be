@@ -6,18 +6,25 @@ import errorRespone from '../utils/errorRespone.js'
 import { sumQuota } from '../utils/statisticalFunction.js'
 const activityUsersStatistics = asyncHandler(async (req, res) => {
   try {
+    const { semester } = req.query
+    const semesterExist = await Semester.findById(semester)
+    if (!semesterExist) {
+      return errorRespone(res, 404, 0, 'error', 'Không tìm thấy học kỳ này!')
+    }
     const result = await Participants.find().populate({
       path: 'task',
-      select: 'officeHours activity',
+      select: 'officeHours semester',
       populate: {
         path: 'activity',
-        select: 'year',
-        populate: {
-          path: 'year',
-          select: 'name',
-        },
+        select: 'type',
       },
     })
+    let newResult = [...result]
+    if (result.length > 0 && semester) {
+      newResult = newResult.filter(
+        (task) => task.task.semester.toString() === semester
+      )
+    }
     const listUser = await User.find({ role: 'STAFF' }).select('name')
     let resultC = []
     if (result && listUser) {
@@ -26,7 +33,7 @@ const activityUsersStatistics = asyncHandler(async (req, res) => {
           id: item._id,
           name: item.name,
           userId: item.userId,
-          ...sumQuota(item.id, result),
+          ...sumQuota(item.id, newResult),
         })
       })
     }
@@ -77,7 +84,6 @@ const activityAUserStatistics = asyncHandler(async (req, res) => {
       )
     }
     let resultC = []
-    console.log(newResult)
     resultC.push({
       id: userExist._id,
       name: userExist.name,
