@@ -9,6 +9,8 @@ import Otps from '../models/otp.model.js'
 import moment from 'moment'
 import { resHtmlForgotPassword } from '../helpers/html/resHtml.js'
 import removeEmpty from '../utils/removeEmpty.js'
+import Departments from '../models/department.model.js'
+import Subject from '../models/subject.model.js'
 
 // @desc   Auth admin and get token
 // @route  POST /api/user/login
@@ -103,8 +105,10 @@ const getUsers = asyncHandler(async (req, res) => {
     const { role } = req.query
     const queryFind = { role }
     const users = await User.find(removeEmpty(queryFind))
+      .populate('department', 'name')
+      .populate('subject', 'name')
       .sort({
-        createdAt: -1,
+        userId: 1,
       })
       .select('-password')
     res.send({
@@ -114,7 +118,7 @@ const getUsers = asyncHandler(async (req, res) => {
       data: { users },
     })
   } catch (err) {
-    return errorRespone(res, 400, 0, 'error', error)
+    return errorRespone(res, 400, 0, 'error', err)
   }
 })
 
@@ -123,21 +127,12 @@ const getUsers = asyncHandler(async (req, res) => {
 // @access Admin
 const createUser = asyncHandler(async (req, res) => {
   try {
-    const {
-      name,
-      userId,
-      password,
-      department,
-      subject,
-      role,
-      email,
-      phone,
-      address,
-    } = req.body
+    const { name, userId, department, subject, role, email, phone, address } =
+      req.body
     const newUser = await new User({
       name,
       userId,
-      password,
+      password: 123456,
       department,
       subject,
       role,
@@ -165,6 +160,8 @@ const createUser = asyncHandler(async (req, res) => {
 
 const updateUser = asyncHandler(async (req, res) => {
   try {
+    const { userId, name, department, subject, role, email, phone, address } =
+      req.body
     const userExists = await User.findById(req.params.id)
     if (!userExists) {
       return errorRespone(
@@ -175,6 +172,31 @@ const updateUser = asyncHandler(async (req, res) => {
         'Không tìm thấy người dùng này!'
       )
     }
+    // Check department exist
+    const isDepartmentExist = await Departments.findById(department)
+    if (!isDepartmentExist) {
+      return errorRespone(res, 404, 0, 'error', 'Không tìm thấy khoa này!')
+    }
+    // Check subject exist
+    const isSubjetExist = await Subject.findById(subject)
+    if (!isSubjetExist) {
+      return errorRespone(res, 404, 0, 'error', 'Không tìm thấy bộ môn này!')
+    }
+    userExists.userId = userId
+    userExists.name = name
+    userExists.department = department
+    userExists.subject = subject
+    userExists.role = role
+    userExists.email = email
+    userExists.phone = phone
+    userExists.address = address
+
+    await userExists.save()
+    return res.send({
+      code: 1,
+      msg: 'success',
+      message: 'Đã cập nhật người dùng!',
+    })
   } catch (error) {
     return errorRespone(res, 400, 0, 'error', error)
   }

@@ -24,7 +24,7 @@ const userSchema = mongoose.Schema(
     },
     department: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Department',
+      ref: 'Departments',
     },
     subject: {
       type: mongoose.Schema.Types.ObjectId,
