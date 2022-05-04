@@ -55,8 +55,13 @@ const userSchema = mongoose.Schema(
     },
     phone: {
       type: String,
-      default: '',
-      unique: true,
+      validate: {
+        validator: function (v) {
+          var re = /\b\d{10}\b/
+          return re.test(v)
+        },
+        message: 'is invalid.',
+      },
     },
     address: {
       type: String,
