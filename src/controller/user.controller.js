@@ -459,8 +459,7 @@ const changePassWithOTP = asyncHandler(async (req, res) => {
 
 export {
   getUsers,
-  authAdmin,
-  authStaff,
+  authAdmin,  authStaff,
   createUser,
   updateUser,
   updateUserPassword,
