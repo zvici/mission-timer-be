@@ -293,6 +293,35 @@ const updateAvatar = asyncHandler(async (req, res) => {
   }
 })
 
+// @desc   Block user
+// @route  Put /api/user/block/:id
+// @access protect, admin
+const blockUser = asyncHandler(async (req, res) => {
+  try {
+    const { id } = req.params
+    //check if user not exists
+    const userExists = await User.findById(id)
+    if (!userExists) {
+      return errorRespone(
+        res,
+        404,
+        0,
+        'error',
+        'Không tìm thấy người dùng này!'
+      )
+    }
+    userExists.isActive = !userExists.isActive
+    await userExists.save()
+    res.status(200).json({
+      code: 1,
+      msg: 'success',
+      message: 'Thành công',
+    })
+  } catch (error) {
+    return errorRespone(res, 400, 0, 'error', error)
+  }
+})
+
 // @desc   Forgot password
 // @route  POST /api/password/forgot-password
 // @access Public
@@ -441,4 +470,5 @@ export {
   forgotPassword,
   checkOtp,
   changePassWithOTP,
+  blockUser,
 }

@@ -32,4 +32,5 @@ router.route('/staff/login').post(authStaff)
 router.route('/updateprofile').put(protect, updateProfileUser)
 router.route('/avatar').post(protect, upload.single('NAME'), updateAvatar)
 router.route('/:id').put(protect, admin, updateUser)
+router.route('/block/:id').put(protect, admin, updateUser)
 export default router
