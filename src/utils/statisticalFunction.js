@@ -9,7 +9,16 @@ const sumQuota = (id, listParticipants) => {
   listParticipants.map((item) => {
     if (item.user._id.toString() === id.toString()) {
       sumTask += 1
-      if (item.task.activity.type === 'MINISTRY' && item.confirmBy) {
+      if (item.status === 'notAnswered') {
+        notAnswered += 1
+      }
+      if (item.status === 'accept') {
+        countAccepted += 1
+      }
+      if (item.status === 'refuse') {
+        countRefuse += 1
+      }
+      if (item.task.activity.type !== 'STAFF' && item.confirmBy) {
         if (item.status === 'done') {
           sumOfficeHours += item.task.officeHours
           countDone += 1
