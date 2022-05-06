@@ -32,6 +32,8 @@ const activityUsersStatistics = asyncHandler(async (req, res) => {
         resultC.push({
           id: item._id,
           name: item.name,
+          avatar: item.avatar,
+          email: item.email,
           userId: item.userId,
           ...sumQuota(item.id, newResult),
         })
@@ -87,7 +89,9 @@ const activityAUserStatistics = asyncHandler(async (req, res) => {
     resultC.push({
       id: userExist._id,
       name: userExist.name,
+      avatar: userExist.avatar,
       userId: userExist.userId,
+      email: userExist.email,
       ...sumQuota(userExist.id, newResult),
     })
 
