@@ -89,33 +89,33 @@ const updateAnswerParticipants = asyncHandler(async (req, res) => {
         'Không tìm thấy người tham gia này!'
       )
     }
-    // check permission STAFF
-    if (isParticipantExist.task.activity.type === 'STAFF') {
-      if (req.user._id.toString() !== isParticipantExist.user.toString()) {
-        return errorRespone(res, 403, 0, 'error', 'Không được phép!')
-      }
-      // If you refuse, there must be a reason
-      if (status === 'refuse') {
-        if (!reason) {
-          return errorRespone(res, 401, 0, 'error', 'Từ chối phải có lý do!')
-        }
-        isParticipantExist.reason = reason
-      }
-      // when completed, must have proof
-      if (status === 'done') {
-        if (!imageBase64) {
-          return errorRespone(
-            res,
-            401,
-            0,
-            'error',
-            'Hoàn thành phải có minh chứng!'
-          )
-        }
-        isParticipantExist.imageBase64 = imageBase64
-      }
-      isParticipantExist.status = status
+    if (isParticipantExist.task.activity.type !== 'STAFF') {
+      return errorRespone(res, 403, 0, 'error', 'Không được phép!')
     }
+    if (req.user._id.toString() !== isParticipantExist.user.toString()) {
+      return errorRespone(res, 403, 0, 'error', 'Không được phép!')
+    }
+    // If you refuse, there must be a reason
+    if (status === 'refuse') {
+      if (!reason) {
+        return errorRespone(res, 401, 0, 'error', 'Từ chối phải có lý do!')
+      }
+      isParticipantExist.reason = reason
+    }
+    // when completed, must have proof
+    if (status === 'done') {
+      if (!imageBase64) {
+        return errorRespone(
+          res,
+          401,
+          0,
+          'error',
+          'Hoàn thành phải có minh chứng!'
+        )
+      }
+      isParticipantExist.imageBase64 = imageBase64
+    }
+    isParticipantExist.status = status
     await isParticipantExist.save()
     return res.send({
       code: 1,
