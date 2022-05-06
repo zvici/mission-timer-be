@@ -25,7 +25,7 @@ const activityUsersStatistics = asyncHandler(async (req, res) => {
         (task) => task.task.semester.toString() === semester
       )
     }
-    const listUser = await User.find({ role: 'STAFF' }).select('name')
+    const listUser = await User.find({ role: 'STAFF' })
     let resultC = []
     if (result && listUser) {
       listUser.map((item) => {
