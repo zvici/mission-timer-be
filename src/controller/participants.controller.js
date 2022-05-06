@@ -1,5 +1,4 @@
 import asyncHandler from 'express-async-handler'
-import Comment from '../models/comment.model.js'
 import Participants from '../models/participants.model.js'
 import errorRespone from '../utils/errorRespone.js'
 import uploads from '../config/cloudinary.config.js'
@@ -69,9 +68,18 @@ const deleteAParticipant = asyncHandler(async (req, res) => {
 
 const updateAnswerParticipants = asyncHandler(async (req, res) => {
   try {
-    const { status, content, imageBase64 } = req.body
+    const { status, reason, imageBase64 } = req.body
     // check id participants exist
-    const isParticipantExist = await Participants.findById(req.params.id)
+    const isParticipantExist = await Participants.findById(
+      req.params.id
+    ).populate({
+      path: 'task',
+      select: 'officeHours semester',
+      populate: {
+        path: 'activity',
+        select: 'type',
+      },
+    })
     if (!isParticipantExist) {
       return errorRespone(
         res,
@@ -82,17 +90,18 @@ const updateAnswerParticipants = asyncHandler(async (req, res) => {
       )
     }
     // check permission
-    if (req.user._id.toString() !== isParticipantExist.user.toString()) {
+    if (
+      req.user._id.toString() !== isParticipantExist.user.toString() &&
+      isParticipantExist.task.activity.type !== 'STAFF'
+    ) {
       return errorRespone(res, 403, 0, 'error', 'Không được phép!')
     }
     // If you refuse, there must be a reason
     if (status === 'refuse') {
-      const newComent = await new Comment({
-        participants: isParticipantExist._id.toString(),
-        user: req.user._id,
-        content,
-      })
-      await newComent.save()
+      if (!reason) {
+        return errorRespone(res, 401, 0, 'error', 'Từ chối phải có lý do!')
+      }
+      isParticipantExist.reason = reason
     }
     // update participant
     isParticipantExist.status = status
@@ -146,8 +155,9 @@ const updateApprove = asyncHandler(async (req, res) => {
         'Không tìm thấy người tham gia này!'
       )
     }
-    isParticipantExist.isApprove = !isParticipantExist.isApprove
+    isParticipantExist.status = 'done'
     isParticipantExist.updatedBy = req.user._id
+    isParticipantExist.confirmBy = req.user._id
     await isParticipantExist.save()
     res.status(200).json({
       code: 1,

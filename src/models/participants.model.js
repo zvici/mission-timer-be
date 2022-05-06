@@ -14,9 +14,9 @@ const participantsSchema = mongoose.Schema(
       enum: ['accept', 'refuse', 'done', 'incomplete', 'notAnswered'],
       default: 'notAnswered',
     },
-    isApprove: {
-      type: Boolean,
-      default: false,
+    reason: {
+      type: String,
+      default: '',
     },
     confirmBy: {
       type: mongoose.Schema.Types.ObjectId,
