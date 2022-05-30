@@ -4,6 +4,9 @@ import Semester from '../models/semester.model.js'
 import User from '../models/user.model.js'
 import errorRespone from '../utils/errorRespone.js'
 import { sumQuota } from '../utils/statisticalFunction.js'
+import Excel from 'exceljs'
+import fs from 'fs'
+
 const activityUsersStatistics = asyncHandler(async (req, res) => {
   try {
     const { semester } = req.query
@@ -108,4 +111,26 @@ const activityAUserStatistics = asyncHandler(async (req, res) => {
   }
 })
 
-export { activityUsersStatistics, activityAUserStatistics }
+const exportFileExcel = asyncHandler(async (req, res) => {
+  const path = 'src/helpers/excel/template_export.xlsx'
+  const excel = fs.realpathSync(path, { encoding: 'utf8' })
+  const workbook = new Excel.Workbook()
+  await workbook.xlsx.readFile(excel)
+  let worksheet = workbook.getWorksheet('name')
+  worksheet.insertRow(8, [3, 'Sam', new Date()])
+
+  res.setHeader(
+    'Content-Type',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  )
+  res.setHeader(
+    'Content-Disposition',
+    'attachment; filename=' + 'template_export.xlsx'
+  )
+
+  await workbook.xlsx.write(res)
+
+  res.end()
+})
+
+export { activityUsersStatistics, activityAUserStatistics, exportFileExcel }
