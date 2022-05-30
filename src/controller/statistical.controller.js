@@ -6,6 +6,7 @@ import errorRespone from '../utils/errorRespone.js'
 import { sumQuota } from '../utils/statisticalFunction.js'
 import Excel from 'exceljs'
 import fs from 'fs'
+import Activities from '../models/activity.model.js'
 
 const activityUsersStatistics = asyncHandler(async (req, res) => {
   try {
@@ -112,25 +113,81 @@ const activityAUserStatistics = asyncHandler(async (req, res) => {
 })
 
 const exportFileExcel = asyncHandler(async (req, res) => {
+  const { user, semester } = req.query
   const path = 'src/helpers/excel/template_export.xlsx'
   const excel = fs.realpathSync(path, { encoding: 'utf8' })
   const workbook = new Excel.Workbook()
   await workbook.xlsx.readFile(excel)
   let worksheet = workbook.getWorksheet('name')
-  worksheet.insertRow(8, [3, 'Sam', new Date()])
-
-  res.setHeader(
-    'Content-Type',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  // get list paricipants by user
+  const result = await Participants.find({ user: user }).populate({
+    path: 'task',
+    select: 'officeHours semester description',
+    populate: {
+      path: 'activity',
+      select: 'title',
+      populate: {
+        path: 'content',
+        select: 'title',
+      },
+    },
+  })
+  // filter by semester
+  let filterSemester = result.filter(
+    (item) => item.task.semester.toString() === semester
   )
-  res.setHeader(
-    'Content-Disposition',
-    'attachment; filename=' + 'template_export.xlsx'
+
+  // group object content -> activity -> task
+
+  let seenContent = new Set(
+    filterSemester.map((v) => v.task.activity.content._id.toString())
   )
 
-  await workbook.xlsx.write(res)
+  // console.log(seenContent)
 
-  res.end()
+  let output;
+  [...seenContent].forEach((item) => {
+    let groupContent = filterSemester.filter(
+      (i) => i.task.activity.content._id.toString() === item
+    )
+    let seenActivity = new Set(
+      groupContent.map((v) => v.task.activity._id.toString())
+    )
+    let listActivity = []
+    ;[...seenActivity].forEach((it) => {
+      let listTask = []
+      groupContent.map((el) => {
+        if (el.task.activity._id.toString() === it)
+          listTask.push(el.task.description)
+      })
+      console.log(listTask)
+      // listActivity.push({
+      //   activity: it,
+      //   task: listTask,
+      // })
+    })
+    output.push({
+      content: item,
+      activity: listActivity,
+    })
+  })
+
+  res.send(output)
+
+  // worksheet.insertRow(8, [3, 'Sam', new Date()])
+
+  // res.setHeader(
+  //   'Content-Type',
+  //   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  // )
+  // res.setHeader(
+  //   'Content-Disposition',
+  //   'attachment; filename=' + 'template_export.xlsx'
+  // )
+
+  // await workbook.xlsx.write(res)
+
+  // res.end()
 })
 
 export { activityUsersStatistics, activityAUserStatistics, exportFileExcel }
