@@ -115,6 +115,12 @@ const activityAUserStatistics = asyncHandler(async (req, res) => {
 
 const exportFileExcel = asyncHandler(async (req, res) => {
   const { user, semester } = req.query
+
+  const userExist = await User.findById(user)
+  if (!userExist) {
+    return errorRespone(res, 404, 0, 'error', 'Không tìm thấy người dùng này!')
+  }
+
   const path = 'src/helpers/excel/template_export.xlsx'
   const excel = fs.realpathSync(path, { encoding: 'utf8' })
   const workbook = new Excel.Workbook()
@@ -146,19 +152,72 @@ const exportFileExcel = asyncHandler(async (req, res) => {
     })
   })
 
+  //set name
+  worksheet.getCell('F22').value = userExist.name
+
   // for list activity
   let row = 8
   let numContent = 1
+  let countRows = 8
+  // location title
+  let locationTitle = []
   grActivity.forEach((element) => {
     worksheet.insertRow(row, [romanize(numContent), element.name])
+    locationTitle.push(row)
     row++
+    countRows++
     let numActivity = 1
     element.actvity.forEach((el) => {
       worksheet.insertRow(row, [numActivity, '', el.title, el.quota])
       row++
       numActivity++
+      countRows++
     })
     numContent++
+  })
+
+  //Style
+  const createBorderRange = (
+    worksheet,
+    start = { row: 8, col: 1 },
+    end = { row: countRows, col: 6 },
+    borderWidth = 'thin'
+  ) => {
+    const borderStyle = {
+      style: borderWidth,
+    }
+    for (let x = start.row; x <= end.row; x++) {
+      for (let y = start.col; y <= end.col; y++) {
+        const cell = worksheet.getCell(x, y)
+        cell.border = {
+          left: borderStyle,
+          right: borderStyle,
+          top: borderStyle,
+          bottom: borderStyle,
+        }
+        cell.font = {
+          size: 12,
+          name: 'Times New Roman',
+        }
+      }
+    }
+  }
+  createBorderRange(worksheet)
+  // style Title
+  locationTitle.forEach((row) => {
+    const cellTitle = worksheet.getCell(row, 2)
+    cellTitle.font = {
+      size: 12,
+      name: 'Times New Roman',
+      bold: true,
+    }
+    const cellNum = worksheet.getCell(row, 1)
+    cellNum.font = {
+      size: 12,
+      name: 'Times New Roman',
+      bold: true,
+    }
+    cellNum.alignment = { horizontal: 'right' }
   })
 
   //res.send(grActivity)
