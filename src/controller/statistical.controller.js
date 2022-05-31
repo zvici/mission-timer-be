@@ -8,6 +8,7 @@ import Excel from 'exceljs'
 import fs from 'fs'
 import Activities from '../models/activity.model.js'
 import romanize from '../helpers/romanize.js'
+import removeAccents from '../helpers/removeAccents.js'
 
 const activityUsersStatistics = asyncHandler(async (req, res) => {
   try {
@@ -228,7 +229,7 @@ const exportFileExcel = asyncHandler(async (req, res) => {
   )
   res.setHeader(
     'Content-Disposition',
-    'attachment; filename=' + 'template_export.xlsx'
+    'attachment; filename=' + `${removeAccents(userExist.name)}.xlsx`
   )
 
   await workbook.xlsx.write(res)
