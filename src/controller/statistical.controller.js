@@ -146,11 +146,20 @@ const exportFileExcel = asyncHandler(async (req, res) => {
       id: element,
       name: activityFilter[0].content.title,
       actvity: activityFilter.map((el) => ({
-        id: el._id,
+        id: el._id.toString(),
         title: el.title,
         quota: el.quota,
       })),
     })
+  })
+  // get list participants by user
+  const resultPar = await Participants.find({ user: user }).populate({
+    path: 'task',
+    select: 'officeHours semester description',
+    populate: {
+      path: 'activity',
+      select: 'type',
+    },
   })
 
   //set name
@@ -169,7 +178,23 @@ const exportFileExcel = asyncHandler(async (req, res) => {
     countRows++
     let numActivity = 1
     element.actvity.forEach((el) => {
-      worksheet.insertRow(row, [numActivity, '', el.title, el.quota])
+      let filterParByAc = resultPar.filter(
+        (item) => item.task.activity._id.toString() === el.id
+      )
+      worksheet.insertRow(row, [
+        numActivity,
+        '',
+        el.title,
+        el.quota,
+        [...filterParByAc].length > 1
+          ? [...filterParByAc].reduce(function (prev, curr) {
+              return prev.task.officeHours + curr.task.officeHours
+            })
+          : [...filterParByAc].length === 1
+          ? [...filterParByAc][0].task.officeHours
+          : '',
+        [...filterParByAc].map((it) => it.task.description).toString(),
+      ])
       row++
       numActivity++
       countRows++
@@ -221,7 +246,16 @@ const exportFileExcel = asyncHandler(async (req, res) => {
     cellNum.alignment = { horizontal: 'right' }
   })
 
-  //res.send(grActivity)
+  //sumQuota
+  worksheet.getCell(`E${countRows}`).value = {
+    formula: `SUM(E8:E${countRows - 1})`,
+  }
+  worksheet.getCell(`E${countRows + 1}`).value = 10
+  worksheet.getCell(`E${countRows + 2}`).value = {
+    formula: `E${countRows}-E${countRows + 1}`,
+  }
+
+  //res.send()
 
   res.setHeader(
     'Content-Type',
