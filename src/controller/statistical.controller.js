@@ -9,6 +9,7 @@ import fs from 'fs'
 import Activities from '../models/activity.model.js'
 import romanize from '../helpers/romanize.js'
 import removeAccents from '../helpers/removeAccents.js'
+import Year from '../models/year.model.js'
 
 const activityUsersStatistics = asyncHandler(async (req, res) => {
   try {
@@ -113,13 +114,20 @@ const activityAUserStatistics = asyncHandler(async (req, res) => {
     return errorRespone(res, 400, 0, 'error', error)
   }
 })
-
+// @desc   export excel
+// @route  GET /api/statistical/export?user=user&year=year
+// @access ADMIN
 const exportFileExcel = asyncHandler(async (req, res) => {
-  const { user, semester } = req.query
+  const { user, year } = req.query
 
   const userExist = await User.findById(user)
   if (!userExist) {
     return errorRespone(res, 404, 0, 'error', 'Không tìm thấy người dùng này!')
+  }
+
+  const yearExist = await Year.findById(year)
+  if (!yearExist) {
+    return errorRespone(res, 404, 0, 'error', 'Không tìm thấy năm học này!')
   }
 
   const path = 'src/helpers/excel/template_export.xlsx'
@@ -152,8 +160,16 @@ const exportFileExcel = asyncHandler(async (req, res) => {
       })),
     })
   })
-  // get list participants by user
-  const resultPar = await Participants.find({ user: user }).populate({
+
+  //get semester by year
+  const resultSe = await Semester.find({
+    year: year,
+  })
+
+  let resultPar = await Participants.find({
+    user: user,
+    semester: { $in: resultSe.map((item) => item._id.toString()) },
+  }).populate({
     path: 'task',
     select: 'officeHours semester description',
     populate: {
@@ -162,8 +178,13 @@ const exportFileExcel = asyncHandler(async (req, res) => {
     },
   })
 
+  console.log(resultPar)
+
   //set name
   worksheet.getCell('F22').value = userExist.name
+
+  //set year
+  worksheet.getCell('A5').value = `Năm học ${yearExist.name}`
 
   // for list activity
   let row = 8
