@@ -178,8 +178,6 @@ const exportFileExcel = asyncHandler(async (req, res) => {
     },
   })
 
-  console.log(resultPar)
-
   //set name
   worksheet.getCell('F22').value = userExist.name
 
