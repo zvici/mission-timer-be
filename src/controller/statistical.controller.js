@@ -61,53 +61,50 @@ const activityUsersStatistics = asyncHandler(async (req, res) => {
 
 const activityAUserStatistics = asyncHandler(async (req, res) => {
   try {
-    const { user } = req.params
-    const { semester } = req.query
-    const userExist = await User.findById(user)
-    if (!userExist) {
-      return errorRespone(
-        res,
-        404,
-        0,
-        'error',
-        'Không tìm thấy người dùng này!'
-      )
+    const { year } = req.query
+    const yearExist = await Year.findById(year)
+    if (!yearExist) {
+      return errorRespone(res, 404, 0, 'error', 'Không tìm thấy năm học này!')
     }
-    const semesterExist = await Semester.findById(semester)
-    if (!semesterExist) {
-      return errorRespone(res, 404, 0, 'error', 'Không tìm thấy học kỳ này!')
-    }
-    const result = await Participants.find({ user: user }).populate({
-      path: 'task',
-      select: 'officeHours semester',
-      populate: {
-        path: 'activity',
-        select: 'type',
-      },
-    })
 
-    let newResult = [...result]
-    if (result.length > 0 && semester) {
-      newResult = newResult.filter(
-        (task) => task.task.semester.toString() === semester
+    let output = []
+    const semesterByYear = await Semester.find({ year: year })
+    if (semesterByYear.length > 0) {
+      await Promise.all(
+        semesterByYear.map(async (item) => {
+          const result = await Participants.find({
+            user: req.user._id,
+            semester: item._id.toString(),
+          }).populate({
+            path: 'task',
+            select: 'officeHours semester',
+            populate: {
+              path: 'activity',
+              select: 'type',
+            },
+          })
+          let newResult = [...result]
+          if (result.length > 0 && item._id.toString()) {
+            newResult = newResult.filter(
+              (task) => task.task.semester.toString() === item._id.toString()
+            )
+          }
+          let resultC = sumQuota(req.user._id, newResult)
+          output.push({
+            id: item._id,
+            name: item.name,
+            ...resultC,
+          })
+        })
       )
     }
-    let resultC = []
-    resultC.push({
-      id: userExist._id,
-      name: userExist.name,
-      avatar: userExist.avatar,
-      userId: userExist.userId,
-      email: userExist.email,
-      ...sumQuota(userExist.id, newResult),
-    })
 
     return res.send({
       code: 1,
       msg: 'success',
-      message: `Thông kê trạng thái hoạt động của giảng viên trong ${semesterExist.name}`,
+      message: `Thông kê trạng thái hoạt động của giảng viên trong ${yearExist.name}`,
       data: {
-        statistic: resultC,
+        statistic: output,
       },
     })
   } catch (error) {

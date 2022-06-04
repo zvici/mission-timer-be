@@ -258,7 +258,7 @@ const updateProfileUser = asyncHandler(async (req, res) => {
       }
     }
     // update profile user
-    await User.findByIdAndUpdate(req.user._id, {
+    const result = await User.findByIdAndUpdate(req.user._id, {
       phone,
       address,
       email,

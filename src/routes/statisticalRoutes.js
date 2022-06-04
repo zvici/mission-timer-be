@@ -9,7 +9,7 @@ import express from 'express'
 const router = express.Router()
 
 router.route('/').get(activityUsersStatistics)
-router.route('/user/:user').get(activityAUserStatistics)
+router.route('/user').get(protect, activityAUserStatistics)
 router.route('/export').get(exportFileExcel)
 
 export default router
