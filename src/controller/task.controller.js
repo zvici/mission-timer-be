@@ -126,8 +126,7 @@ const createTask = asyncHandler(async (req, res) => {
           status: 'done',
         },
       }
-      const a = await client.createNotification(notification)
-      console.log(a)
+      await client.createNotification(notification)
     }
     return res.send({
       code: 1,
