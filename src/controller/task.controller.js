@@ -86,6 +86,7 @@ const createTask = asyncHandler(async (req, res) => {
           createdBy: req.user._id.toString(),
         }))
       )
+      // map user
       const listUser = await User.find({})
       let listDevices = []
       listUser
@@ -96,7 +97,7 @@ const createTask = asyncHandler(async (req, res) => {
           listDevices.push(...el.devices)
         })
 
-      notification.include_player_ids = listDevices
+      notification.included_segments = ['Active Users']
       notification.filters = [
         { field: 'tag', key: 'userId', relation: '=', value: '00001' },
       ]
@@ -107,7 +108,26 @@ const createTask = asyncHandler(async (req, res) => {
           .format('DD/MM/YYYY - HH:mm')
           .toString()}`,
       }
-      await client.createNotification(notification)
+      notification.headings = {
+        en: 'Có công việc mới',
+      }
+      notification.ios_badge_count = 1
+      notification.ios_badge_type = 'Increase'
+      notification.data = {
+        notification: {
+          body: description,
+          title: 'Có công việc mới',
+          sound: 'alert.aiff',
+        },
+        priority: 'high',
+        data: {
+          click_action: 'FLUTTER_NOTIFICATION_CLICK',
+          id: '1',
+          status: 'done',
+        },
+      }
+      const a = await client.createNotification(notification)
+      console.log(a)
     }
     return res.send({
       code: 1,

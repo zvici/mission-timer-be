@@ -250,7 +250,7 @@ const getProfileMe = asyncHandler(async (req, res) => {
 // @access Public
 const updateProfileUser = asyncHandler(async (req, res) => {
   try {
-    const { phone, address, email } = req.body
+    const { phone, address, email, avatar } = req.body
     if (email !== req.user.email) {
       const isEmailExists = await User.exists({ email })
       if (isEmailExists) {
@@ -262,6 +262,7 @@ const updateProfileUser = asyncHandler(async (req, res) => {
       phone,
       address,
       email,
+      avatar,
     })
     return res.status(200).json({
       code: 1,

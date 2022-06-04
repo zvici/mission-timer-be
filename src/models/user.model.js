@@ -71,10 +71,6 @@ const userSchema = mongoose.Schema(
       type: String,
       default: '',
     },
-    devices: {
-      type: Array,
-      default: [''],
-    },
   },
   { timestamps: true }
 )
