@@ -33,6 +33,7 @@ const resHtmlForgotPassword = ({ name, otp }) => {
                         >${name}</span
                       >
                     </p>
+                <p>OTP có thời hạn 15 phút, vui lòng xác nhận trước thời hạn:</p>
                 <p>Đây là mã OTP của bạn:</p>
                 <p style="font-weight: bold; font-size: 20px">${otp}</p>
               </td>
