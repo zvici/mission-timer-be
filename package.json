@@ -10,6 +10,7 @@
     "data:destroy": "node src/seeder -d"
   },
   "dependencies": {
+    "@onesignal/node-onesignal": "^1.0.0-beta4",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^1.29.0",
     "colors": "^1.4.0",

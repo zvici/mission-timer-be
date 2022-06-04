@@ -5,6 +5,10 @@ import Semester from '../models/semester.model.js'
 import Task from '../models/task.model.js'
 import errorRespone from '../utils/errorRespone.js'
 import removeEmpty from '../utils/removeEmpty.js'
+import * as OneSignal from '@onesignal/node-onesignal'
+import client from '../config/onesignal.js'
+import User from '../models/user.model.js'
+import moment from 'moment'
 
 // @desc   Create one Task
 // @route  POST /api/activity-detail
@@ -12,6 +16,8 @@ import removeEmpty from '../utils/removeEmpty.js'
 
 const createTask = asyncHandler(async (req, res) => {
   try {
+    const notification = new OneSignal.Notification()
+    notification.app_id = process.env.ONE_SIGNAL_APP_ID
     const {
       activity,
       description,
@@ -74,12 +80,34 @@ const createTask = asyncHandler(async (req, res) => {
       req.user.role.toString() === 'MINISTRY'
     ) {
       participants = await Participants.insertMany(
-        listOfParticipants.map((item) => ({
+        [...listOfParticipants].map((item) => ({
           user: item.toString(),
           task: saveTask._id.toString(),
           createdBy: req.user._id.toString(),
         }))
       )
+      const listUser = await User.find({})
+      let listDevices = []
+      listUser
+        .filter((item) =>
+          listOfParticipants.some((it) => item._id.toString() === it)
+        )
+        .map((el) => {
+          listDevices.push(...el.devices)
+        })
+
+      notification.include_player_ids = listDevices
+      notification.filters = [
+        { field: 'tag', key: 'userId', relation: '=', value: '00001' },
+      ]
+      notification.contents = {
+        en: `${description} - ${moment(startDate)
+          .format('DD/MM/YYYY - HH:mm')
+          .toString()} - ${moment(endDate)
+          .format('DD/MM/YYYY - HH:mm')
+          .toString()}`,
+      }
+      await client.createNotification(notification)
     }
     return res.send({
       code: 1,
