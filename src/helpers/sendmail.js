@@ -5,8 +5,8 @@ const sendMail = (mailto, subject, text, html) => {
     const transporter = nodemailer.createTransport({
       service: 'Gmail',
       auth: {
-        user: 'nhatranthanh115@gmail.com',
-        pass: 'matkhaucc',
+        user: 'nhatranthanh117@gmail.com',
+        pass: 'bywqkfpscrepupzd',
       },
     })
 

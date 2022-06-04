@@ -232,7 +232,7 @@ const updateUserPassword = asyncHandler(async (req, res) => {
 })
 
 // @desc   Update profile for user
-// @route  Put /api/user/me
+// @route  Get /api/user/me
 // @access Protect
 const getProfileMe = asyncHandler(async (req, res) => {
   return res.status(200).json({
@@ -366,7 +366,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
     res.status(200).json({
       code: 1,
       msg: 'success',
-      message: 'Gửi mail thành công',
+      message: `Vui lòng kiểm tra tại hộp thư email ${userExists.email}`,
     })
   } catch (error) {
     return errorRespone(res, 400, 0, 'error', error)
