@@ -61,19 +61,6 @@ const createTask = asyncHandler(async (req, res) => {
     })
     const saveTask = await newTask.save()
     let participants
-    // if user create Task
-    if (
-      activityExist.type.toString() === 'STAFF' &&
-      req.user.role.toString() === 'STAFF'
-    ) {
-      // Create new participants
-      participants = await new Participants({
-        task: saveTask._id.toString(),
-        user: req.user._id.toString(),
-        createdBy: req.user._id,
-      })
-      await participants.save()
-    }
     // if admin and Ministry create task
     if (
       req.user.role.toString() === 'ADMIN' ||
@@ -96,6 +83,8 @@ const createTask = asyncHandler(async (req, res) => {
         .map((el) => {
           listDevices.push(...el.devices)
         })
+
+      // create notification
 
       notification.included_segments = ['Active Users']
       notification.filters = [

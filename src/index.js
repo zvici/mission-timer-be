@@ -22,6 +22,7 @@ import contentRoutes from './routes/contentRoutes.js'
 import semesterRoutes from './routes/semesterRouter.js'
 import participantRoutes from './routes/participantRoutes.js'
 import subjectRoutes from './routes/subjectRoutes.js'
+import notificationRoutes from './routes/notificationRoutes.js'
 
 dotenv.config()
 connectDB()
@@ -52,18 +53,19 @@ app.use('/api/activity', activityRoutes)
 app.use('/api/task', taskRoutes)
 app.use('/api/participant', participantRoutes)
 app.use('/api/subject', subjectRoutes)
+app.use('/api/notification', notificationRoutes)
 
 app.get('/', (req, res) => {
   res.send({
     message: 'Welcome to Api Mission timer',
-    time: new Date()
+    time: new Date(),
   })
 })
 
 app.get('/api', (req, res) => {
   res.send({
     message: 'Welcome to Api Mission timer',
-    time: new Date()
+    time: new Date(),
   })
 })
 

@@ -14,10 +14,22 @@ const notificationSchema = mongoose.Schema(
     seen: {
       type: Boolean,
     },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
+    updatedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
   },
   { timestamps: true }
 )
 
 const Notification = mongoose.model('Notification', notificationSchema)
 
-export default Year
+export default Notification
