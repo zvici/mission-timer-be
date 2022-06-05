@@ -114,9 +114,41 @@ const createTask = asyncHandler(async (req, res) => {
             type: 'task',
             data: saveNoti,
           },
-          send_after: moment().add(5, 'minutes').toString(),
+        }
+        const notificationAfter = {
+          // create notification
+          included_segments: ['Subscribed Users'],
+          filters: [
+            {
+              field: 'tag',
+              key: 'userId',
+              relation: '=',
+              value: findIDUser.userId,
+            },
+          ],
+          contents: {
+            en: `${description} - ${moment(startDate)
+              .format('DD/MM/YYYY - HH:mm')
+              .toString()} - ${moment(endDate)
+              .format('DD/MM/YYYY - HH:mm')
+              .toString()}`,
+          },
+          headings: {
+            en: 'Có công việc mới',
+          },
+          ios_badge_count: 1,
+          ios_badge_type: 'Increase',
+          data: {
+            body: description,
+            title: 'Có công việc mới',
+            sound: 'alert.aiff',
+            type: 'task',
+            data: saveNoti,
+          },
+          send_after: moment(startDate).subtract(5, 'minutes').toString(),
         }
         await client.createNotification(notification)
+        await client.cancelNotification(notificationAfter)
       })
     )
 

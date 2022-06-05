@@ -55,7 +55,7 @@ const getNotiMe = asyncHandler(async (req, res) => {
       user: req.user._id,
     })
       .limit(limit)
-      .skip(limit * (page - 1))
+      .skip(limit * page - limit)
     res.send({
       code: 1,
       msg: 'success',

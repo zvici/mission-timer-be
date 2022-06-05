@@ -204,8 +204,12 @@ const exportFileExcel = asyncHandler(async (req, res) => {
         el.quota,
         [...filterParByAc].length > 1
           ? [...filterParByAc].reduce(function (prev, curr) {
-              return prev.task.officeHours + curr.task.officeHours
-            })
+              return {
+                task: {
+                  officeHours: prev.task.officeHours + curr.task.officeHours,
+                },
+              }
+            }).task.officeHours
           : [...filterParByAc].length === 1
           ? [...filterParByAc][0].task.officeHours
           : '',
@@ -237,6 +241,7 @@ const exportFileExcel = asyncHandler(async (req, res) => {
           top: borderStyle,
           bottom: borderStyle,
         }
+        cell.alignment = { wrapText: true }
         cell.font = {
           size: 12,
           name: 'Times New Roman',
