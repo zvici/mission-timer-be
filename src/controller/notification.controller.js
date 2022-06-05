@@ -47,15 +47,23 @@ const createNoti = asyncHandler(async (req, res) => {
 // @access Staff
 const getNotiMe = asyncHandler(async (req, res) => {
   try {
+    const { page, limit } = req.query
+    const countNoti = await Notification.count({
+      user: req.user._id,
+    })
     const listNotiMe = await Notification.find({
       user: req.user._id,
     })
+      .limit(limit)
+      .skip(limit * (page - 1))
     res.send({
       code: 1,
       msg: 'success',
       message: 'Danh sách thông báo',
       data: {
         notifications: listNotiMe,
+        page: parseInt(page),
+        pages: Math.floor(countNoti / limit + 1),
       },
     })
   } catch (err) {
@@ -64,7 +72,7 @@ const getNotiMe = asyncHandler(async (req, res) => {
 })
 
 // @desc   update one
-// @route  PUT /api/notification/seen
+// @route  PUT /api/notification/seen/:id
 // @access Staff
 const updateNotification = asyncHandler(async (req, res) => {
   try {
@@ -73,7 +81,7 @@ const updateNotification = asyncHandler(async (req, res) => {
     if (!isNotificaitonExist) {
       return errorRespone(res, 404, 0, 'error', 'Không tìm thấy thông báo này!')
     }
-    if (isNotificaitonExist.user.toString() !== req.user._id) {
+    if (isNotificaitonExist.user.toString() !== req.user._id.toString()) {
       return errorRespone(res, 403, 0, 'error', 'Bạn không có quyền!')
     }
     isNotificaitonExist.seen = true

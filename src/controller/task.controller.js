@@ -114,6 +114,7 @@ const createTask = asyncHandler(async (req, res) => {
             type: 'task',
             data: saveNoti,
           },
+          send_after: moment().add(5, 'minutes').toString(),
         }
         await client.createNotification(notification)
       })

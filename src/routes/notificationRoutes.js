@@ -12,7 +12,7 @@ const router = express.Router()
 router.route('/').post(protect, admin, createNoti)
 
 router.route('/me').get(protect, getNotiMe)
-router.route('/seen/:id').get(protect, updateNotification)
+router.route('/seen/:id').put(protect, updateNotification)
 router.route('/:id').delete(protect, admin, deleteNotification)
 
 export default router
