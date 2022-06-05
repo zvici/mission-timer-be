@@ -5,9 +5,6 @@ const notificationSchema = mongoose.Schema(
     title: {
       type: String,
     },
-    data: {
-      type: Object,
-    },
     content: {
       type: String,
     },
@@ -17,6 +14,12 @@ const notificationSchema = mongoose.Schema(
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
+    },
+    type: {
+      type: String,
+      enum: ['task', 'admin'],
+      required: true,
+      default: 'task',
     },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,

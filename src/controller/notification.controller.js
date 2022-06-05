@@ -23,7 +23,6 @@ const createNoti = asyncHandler(async (req, res) => {
     }
     const notification = await new Notification({
       title,
-      data,
       content,
       seen,
       user,

@@ -68,7 +68,7 @@ const deleteAParticipant = asyncHandler(async (req, res) => {
 
 const updateAnswerParticipants = asyncHandler(async (req, res) => {
   try {
-    const { status, reason, imageBase64 } = req.body
+    const { status, reason, image } = req.body
     // check id participants exist
     const isParticipantExist = await Participants.findById(
       req.params.id
@@ -104,7 +104,7 @@ const updateAnswerParticipants = asyncHandler(async (req, res) => {
     }
     // when completed, must have proof
     if (status === 'done') {
-      if (!imageBase64) {
+      if (!image) {
         return errorRespone(
           res,
           401,
@@ -113,7 +113,7 @@ const updateAnswerParticipants = asyncHandler(async (req, res) => {
           'Hoàn thành phải có minh chứng!'
         )
       }
-      isParticipantExist.imageBase64 = imageBase64
+      isParticipantExist.image = image
     }
     isParticipantExist.status = status
     await isParticipantExist.save()

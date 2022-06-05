@@ -11,6 +11,7 @@ import { resHtmlForgotPassword } from '../helpers/html/resHtml.js'
 import removeEmpty from '../utils/removeEmpty.js'
 import Departments from '../models/department.model.js'
 import Subject from '../models/subject.model.js'
+import Notification from '../models/notification.model.js'
 
 // @desc   Auth admin and get token
 // @route  POST /api/user/login
@@ -235,14 +236,54 @@ const updateUserPassword = asyncHandler(async (req, res) => {
 // @route  Get /api/user/me
 // @access Protect
 const getProfileMe = asyncHandler(async (req, res) => {
-  return res.status(200).json({
-    code: 1,
-    msg: 'success',
-    message: 'Thông tin hồ sơ cá nhân!',
-    data: {
-      profile: req.user,
-    },
-  })
+  // upadate password
+  try {
+    // count notification not seen
+    const countNotSeen = await Notification.count({
+      user: req.user._id,
+      seen: false,
+    })
+    const {
+      _id,
+      name,
+      userId,
+      role,
+      email,
+      isActive,
+      isPasswordChanged,
+      phone,
+      address,
+      avatar,
+      department,
+      subject,
+    } = await User.findById(req.user._id)
+      .populate('subject', 'name')
+      .populate('department', 'name')
+    return res.status(200).json({
+      code: 1,
+      msg: 'success',
+      message: 'Thông tin hồ sơ cá nhân!',
+      data: {
+        profile: {
+          _id,
+          name,
+          userId,
+          role,
+          email,
+          isActive,
+          isPasswordChanged,
+          phone,
+          address,
+          avatar,
+          department: department.name,
+          subject: subject.name,
+          countNotSeen,
+        },
+      },
+    })
+  } catch (error) {
+    return errorRespone(res, 400, 0, 'error', error)
+  }
 })
 
 // @desc   Update profile for user
