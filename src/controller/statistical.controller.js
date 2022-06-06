@@ -13,23 +13,29 @@ import Year from '../models/year.model.js'
 
 const activityUsersStatistics = asyncHandler(async (req, res) => {
   try {
-    const { semester } = req.query
-    const semesterExist = await Semester.findById(semester)
-    if (!semesterExist) {
-      return errorRespone(res, 404, 0, 'error', 'Không tìm thấy học kỳ này!')
+    const { year } = req.query
+    const yearExist = await Year.findById(year)
+    if (!yearExist) {
+      return errorRespone(res, 404, 0, 'error', 'Không tìm thấy năm học này!')
     }
     const result = await Participants.find().populate({
       path: 'task',
       select: 'officeHours semester',
-      populate: {
-        path: 'activity',
-        select: 'type',
-      },
+      populate: [
+        {
+          path: 'activity',
+          select: 'type',
+        },
+        {
+          path: 'semester',
+          select: 'year',
+        },
+      ],
     })
     let newResult = [...result]
-    if (result.length > 0 && semester) {
+    if (result.length > 0 && year) {
       newResult = newResult.filter(
-        (task) => task.task.semester.toString() === semester
+        (task) => task.task.semester.year.toString() === year
       )
     }
     const listUser = await User.find({ role: 'STAFF' })
