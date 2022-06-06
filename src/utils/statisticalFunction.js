@@ -27,7 +27,7 @@ const sumQuota = (id, listParticipants) => {
           countIncomplete += 1
         }
       }
-      if (item.task.activity.type === 'STAFF' && item.imageBase64) {
+      if (item.task.activity.type === 'STAFF' && item.image) {
         if (item.status === 'incomplete') {
           countIncomplete += 1
         }

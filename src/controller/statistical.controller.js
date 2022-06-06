@@ -169,7 +169,7 @@ const exportFileExcel = asyncHandler(async (req, res) => {
     year: year,
   })
 
-  let resultPar = await Participants.find({
+  let resultParAll = await Participants.find({
     user: user,
     semester: { $in: resultSe.map((item) => item._id.toString()) },
   }).populate({
@@ -180,6 +180,12 @@ const exportFileExcel = asyncHandler(async (req, res) => {
       select: 'type',
     },
   })
+
+  let resultPar = resultParAll.filter(
+    (item) =>
+      (item.task.activity.type !== 'STAFF' && item.confirmBy) ||
+      (item.task.activity.type === 'STAFF' && item.image)
+  )
 
   //set name
   worksheet.getCell('F22').value = userExist.name
