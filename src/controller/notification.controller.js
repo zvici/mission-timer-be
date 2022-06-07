@@ -2,6 +2,7 @@ import asyncHandler from 'express-async-handler'
 import Notification from '../models/notification.model.js'
 import User from '../models/user.model.js'
 import errorRespone from '../utils/errorRespone.js'
+import client from '../config/onesignal.js'
 
 // @desc   Create one notification
 // @route  POST /api/notification
@@ -9,33 +10,43 @@ import errorRespone from '../utils/errorRespone.js'
 
 const createNoti = asyncHandler(async (req, res) => {
   try {
-    const { title, data, content, seen, user } = req.body
-    // check department exist
-    const isUserExist = await User.findById(user)
-    if (!isUserExist) {
-      return errorRespone(
-        res,
-        404,
-        0,
-        'error',
-        'Không tìm thấy người dùng này!'
-      )
-    }
-    const notification = await new Notification({
-      title,
-      content,
-      seen,
-      user,
-      createdBy: req.user._id,
+    const { title, data, content, startDate } = req.body
+    const listUser = await User.find({ role: 'STAFF' })
+    let listIns = []
+    listUser.map(async (user) => {
+      listIns.push({
+        title,
+        content,
+        seen: false,
+        user: user._id.toString(),
+        createdBy: req.user._id,
+      })
     })
-    const newNotification = await notification.save()
+    await Notification.insertMany(listIns)
+    const notificationAfter = {
+      // create notification
+      included_segments: ['Subscribed Users'],
+      contents: {
+        en: `${content} - ${moment(startDate).format('DD/MM/YYYY - HH:mm')}`,
+      },
+      headings: {
+        en: title,
+      },
+      ios_badge_count: 1,
+      ios_badge_type: 'Increase',
+      data: {
+        body: content,
+        title: title,
+        sound: 'alert.aiff',
+        type: 'admin',
+      },
+      send_after: moment(startDate).toString(),
+    }
+    await client.createNotification(notificationAfter)
     res.send({
       code: 1,
       msg: 'success',
       message: 'Đã tạo thông báo!',
-      data: {
-        notification: newNotification,
-      },
     })
   } catch (err) {
     return errorRespone(res, 400, 0, 'error', err)
